@@ -106,15 +106,15 @@ git add .
 5. **Faça o commit das alterações**:
 
 ```bash
-git commit -m "feat: descrição da alteração"
+git commit -m "descrição da alteração"
 ```
 
 > **Exemplos de commits:**
 
 ```bash
-git commit -m "feat: adiciona tela de login"
-git commit -m "fix: corrige validação de formulário"
-git commit -m "style: melhora estilização da dashboard"
+git commit -m "adiciona tela de login"
+git commit -m "corrige validação de formulário"
+git commit -m "melhora estilização da dashboard"
 ```
 
 6. **Envie sua branch para o GitHub**:
