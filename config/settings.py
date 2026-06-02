@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
 from pathlib import Path
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,12 +21,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-4o1er(v4lu&2n41va(!_x9l$e_5r7+$(9b39xvsm18hmerx+(='
+SECRET_KEY = config('SECRET_KEY', default='replace-me')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config('DEBUG', default=True, cast=bool)
 
-ALLOWED_HOSTS = []
+# Hosts (comma-separated in .env, e.g. .env: ALLOWED_HOSTS=localhost,example.com)
+_allowed_hosts = config('ALLOWED_HOSTS', default='')
+ALLOWED_HOSTS = _allowed_hosts.split(',') if _allowed_hosts else []
 
 
 # Application definition
@@ -77,11 +80,11 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'assistencia_social',
-        'USER': 'root',
-        'PASSWORD': 'root',
-        'HOST': '127.0.0.1',
-        'PORT': '3306'
+        'NAME': config('DB_NAME', default='assistencia_social'),
+        'USER': config('DB_USER', default='root'),
+        'PASSWORD': config('DB_PASSWORD', default='senha'),
+        'HOST': config('DB_HOST', default='127.0.0.1'),
+        'PORT': config('DB_PORT', default='3306'),
     }
 }
 
