@@ -1,4 +1,10 @@
 from django.db import models
+from django.core.validators import RegexValidator
+
+cpf_validator = RegexValidator(
+    regex=r'^\d{3}\.\d{3}\.\d{3}-\d{2}$',
+    message="CPF deve estar no formato 000.000.000-00"
+)
 
 # Create your models here.
 class Endereco(models.Model):
@@ -34,3 +40,20 @@ class Aluno(models.Model):
     
     def __str__(self):
         return f"{self.ra} - {self.nome} - {self.curso} - {self.email}"
+
+class Responsavel(models.Model):
+    aluno = models.ForeignKey("Aluno", on_delete=models.CASCADE, related_name="responsaveis")
+    nome = models.CharField("Nome", max_length=255)
+    cpf = models.CharField("CPF", max_length=14, validators=[cpf_validator], unique=True)
+    telefone = models.CharField("Telefone", max_length=20)
+    email = models.EmailField("Email", max_length=255, blank=True, null=True)
+    endereco = models.ForeignKey(Endereco, on_delete=models.SET_NULL, null=True, blank=True, related_name="responsaveis")
+    parentesco = models.CharField("Parentesco", max_length=10)
+    
+    class Meta:
+        verbose_name = "Responsável"
+        verbose_name_plural = "Responsáveis"
+        db_table = "responsavel"
+        
+    def __str__(self):
+        return self.nome
