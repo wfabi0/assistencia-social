@@ -1,5 +1,16 @@
 from django.db import models
 from django.core.validators import RegexValidator
+from django.contrib.auth.models import AbstractUser
+
+class Usuario(AbstractUser):
+    cress = models.CharField("CRESS", max_length=20, blank=True)
+
+    class Meta:
+        verbose_name = "Usuário"
+        verbose_name_plural = "Usuários"
+
+    def __str__(self):
+        return self.get_full_name() or self.username
 
 cpf_validator = RegexValidator(
     regex=r'^\d{3}\.\d{3}\.\d{3}-\d{2}$',
