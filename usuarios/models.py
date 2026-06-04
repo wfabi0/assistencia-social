@@ -74,3 +74,20 @@ class Servidor(models.Model):
     
     def __str__(self):
         return f"{self.siape} - {self.nome} - {self.cargo} - {self.email}"
+
+class UsuarioExterno(models.Model):
+    nome = models.CharField("Nome", max_length=255)
+    cpf = models.CharField("CPF", max_length=14, validators=[cpf_validator], unique=True)
+    data_nascimento = models.DateField("Data de Nascimento")
+    email = models.EmailField("Email", max_length=255, blank=True, null=True)
+    telefone = models.CharField("Telefone", max_length=20, blank=True, null=True)
+    endereco = models.ForeignKey(Endereco, on_delete=models.SET_NULL, null=True, blank=True, related_name="usuarios_externos")
+    
+    class Meta:
+        verbose_name = "Usuário Externo"
+        verbose_name_plural = "Usuários Externos"
+        db_table = "usuario_externo"
+        ordering = ['nome']
+    
+    def __str__(self):
+        return self.nome
