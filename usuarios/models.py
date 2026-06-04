@@ -57,3 +57,20 @@ class Responsavel(models.Model):
         
     def __str__(self):
         return self.nome
+
+class Servidor(models.Model):
+    siape = models.CharField("SIAPE", max_length=20, unique=True)
+    nome = models.CharField("Nome", max_length=255)
+    cargo = models.CharField("Cargo", max_length=255)
+    email = models.EmailField("Email", max_length=255, blank=True, null=True)
+    telefone = models.CharField("Telefone", max_length=20, blank=True, null=True)
+    endereco = models.ForeignKey(Endereco, on_delete=models.SET_NULL, null=True, blank=True, related_name="servidores")
+    
+    class Meta:
+        verbose_name = "Servidor"
+        verbose_name_plural = "Servidores"
+        db_table = "servidor"
+        ordering = ['nome']
+    
+    def __str__(self):
+        return f"{self.siape} - {self.nome} - {self.cargo} - {self.email}"
