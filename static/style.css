@@ -1,0 +1,102 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+    background-color: #f4f4f4;
+}
+
+/* Cabeçalho */
+.header {
+    background-color: #0d6efd;
+    color: white;
+    padding: 15px 30px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-size: 22px;
+    font-weight: bold;
+}
+
+.usuario-logado {
+    font-size: 16px;
+}
+
+/* Menu */
+.navbar {
+    background-color: #343a40;
+}
+
+.navbar ul {
+    list-style: none;
+    display: flex;
+}
+
+.navbar ul li {
+    position: relative;
+}
+
+.navbar ul li a {
+    display: block;
+    padding: 15px 20px;
+    color: white;
+    text-decoration: none;
+}
+
+.navbar ul li a:hover {
+    background-color: #495057;
+}
+
+/* Dropdown */
+.dropdown-content {
+    display: none;
+    position: absolute;
+    min-width: 180px;
+    background: white;
+    z-index: 999;
+    box-shadow: 0 2px 10px rgba(0,0,0,.2);
+}
+
+.dropdown-content li {
+    width: 100%;
+}
+
+.dropdown-content li a {
+    color: #333;
+}
+
+.dropdown-content li a:hover {
+    background-color: #e9ecef;
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+/* Usuário à direita */
+.usuario-menu {
+    margin-left: auto;
+}
+
+/* Breadcrumb */
+.breadcrumb {
+    background: #e9ecef;
+    padding: 12px 30px;
+    font-size: 14px;
+    color: #555;
+}
+
+/* Conteúdo */
+.container {
+    padding: 30px;
+    background: white;
+    margin: 20px;
+    border-radius: 8px;
+}
