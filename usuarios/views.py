@@ -1,10 +1,11 @@
+from django.http import JsonResponse
 from django.db.models import Q
 from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, ListView, UpdateView
 
 from .forms import ServidorForm
-from .models import Servidor
+from .models import Endereco, Servidor
 
 
 def home(request):
@@ -29,6 +30,32 @@ def aluno_update(request, pk=None):
 
 def aluno_historico(request, pk=None):
     return render(request, 'usuarios/aluno_detail.html')
+
+
+def endereco_autocomplete(request):
+    query = request.GET.get('q', '').strip()
+
+    if not query:
+        return JsonResponse({'results': []})
+
+    enderecos = Endereco.objects.filter(
+        Q(logradouro__icontains=query)
+        | Q(numero__icontains=query)
+        | Q(bairro__icontains=query)
+        | Q(cidade__icontains=query)
+        | Q(estado__icontains=query)
+        | Q(cep__icontains=query)
+    ).order_by('logradouro', 'numero')[:10]
+
+    results = [
+        {
+            'id': endereco.pk,
+            'label': str(endereco),
+        }
+        for endereco in enderecos
+    ]
+
+    return JsonResponse({'results': results})
 
 
 class ServidorListView(ListView):

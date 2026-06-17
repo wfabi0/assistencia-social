@@ -15,6 +15,9 @@ urlpatterns = [
     path('alunos/<int:pk>/historico/',
          views.aluno_historico, name='aluno_historico'),
 
+    path('enderecos/busca/', views.endereco_autocomplete,
+         name='endereco_autocomplete'),
+
     path('servidores/', views.ServidorListView.as_view(), name='servidor_list'),
 
     path('servidores/novo/', views.ServidorCreateView.as_view(),
