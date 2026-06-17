@@ -12,5 +12,20 @@ urlpatterns = [
 
     path('alunos/<int:pk>/editar/', views.aluno_update, name='aluno_update'),
 
-    path('alunos/<int:pk>/historico/', views.aluno_historico, name='aluno_historico'),
+    path('alunos/<int:pk>/historico/',
+         views.aluno_historico, name='aluno_historico'),
+
+    path('enderecos/busca/', views.endereco_autocomplete,
+         name='endereco_autocomplete'),
+
+    path('servidores/', views.ServidorListView.as_view(), name='servidor_list'),
+
+    path('servidores/novo/', views.ServidorCreateView.as_view(),
+         name='servidor_create'),
+
+    path('servidores/<int:pk>/editar/',
+         views.ServidorUpdateView.as_view(), name='servidor_update'),
+
+    path('servidores/<int:pk>/excluir/',
+         views.ServidorDeleteView.as_view(), name='servidor_delete'),
 ]

@@ -13,3 +13,15 @@ body {
 .breadcrumb {
     margin-bottom: 0;
 }
+
+.autocomplete-wrapper {
+    z-index: 3;
+}
+
+.autocomplete-results {
+    top: 100%;
+    left: 0;
+    max-height: 240px;
+    overflow-y: auto;
+    z-index: 10;
+}
