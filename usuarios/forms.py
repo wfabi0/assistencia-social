@@ -7,7 +7,8 @@ from .models import Endereco, Servidor
 
 
 ENDERECO_PATTERN = re.compile(
-    r'^\s*(?P<logradouro>.+?),\s*(?P<numero>.+?)\s*-\s*(?P<bairro>.+?),\s*(?P<cidade>.+?)\s*-\s*(?P<estado>.+?),\s*CEP:\s*(?P<cep>.+?)\s*$'
+    r'^\s*(?P<logradouro>.+?)\s*,\s*(?P<numero>.+?)\s*[,\-]\s*(?P<bairro>.+?)\s*[,\-]\s*(?P<cidade>.+?)\s*[,\-]\s*(?P<estado>[A-Za-z]{2})\s*[,\-]?\s*(?:CEP[:\s]*)?(?P<cep>\d{5}-?\d{3})\s*$',
+    re.IGNORECASE
 )
 
 
@@ -74,8 +75,10 @@ class ServidorForm(forms.ModelForm):
                 'placeholder': 'email@exemplo.com'
             }),
             'telefone': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': '(00) 00000-0000'
+                'class': 'form-control telefone-mask',
+                'placeholder': '(00) 00000-0000',
+                'maxlength': '15',
+                'onkeyup': "let v=this.value.replace(/\D/g,''); v=v.replace(/^(\d{2})(\d)/g,'($1) $2'); v=v.replace(/(\d)(\d{4})$/,'$1-$2'); this.value=v;"
             }),
         }
 
@@ -144,17 +147,27 @@ class ServidorForm(forms.ModelForm):
         if not telefone:
             return telefone
 
-        telefone = telefone.strip()
+        numeros = re.sub(r'\D', '', telefone)
 
-        if not all(
-            char.isdigit() or char in ' ()+-'
-            for char in telefone
-        ):
+        if numeros.startswith('55') and len(numeros) > 11:
+            numeros = numeros[2:]
+
+        tamanho = len(numeros)
+
+        if tamanho == 0:
+            return ''
+
+        if tamanho not in (10, 11):
             raise ValidationError(
-                'Informe um telefone válido.'
+                'Informe um telefone válido com DDD (ex: 31 99999-9999).'
             )
 
-        return telefone
+        if tamanho == 11:
+            telefone_formatado = f"({numeros[:2]}) {numeros[2:7]}-{numeros[7:]}"
+        else:
+            telefone_formatado = f"({numeros[:2]}) {numeros[2:6]}-{numeros[6:]}"
+
+        return telefone_formatado
 
     def clean_endereco_busca(self):
         return self.cleaned_data.get(
