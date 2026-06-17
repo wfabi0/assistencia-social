@@ -23,11 +23,9 @@ class AtendimentoForm(forms.ModelForm):
         cleaned_data = super().clean()
         tipo_pessoa = cleaned_data.get("tipo_pessoa")
         
-        # Validação de data obrigatória
         if not cleaned_data.get("data_atendimento"):
             raise ValidationError("A data do atendimento é obrigatória.")
         
-        # Validação de pessoa e limpeza das FKs não utilizadas
         if tipo_pessoa == "ALU":
             if not cleaned_data.get("aluno"):
                 raise ValidationError("Selecione o aluno atendido.")
