@@ -18,7 +18,7 @@
             <label class="form-label">Resultados por página</label>
             <select name="page_size" class="form-select">
                 {% for option in page_size_options %}
-                <option value="{{ option }}" {% if page_size==option %} selected{% endif %}>{{ option }}</option>
+                <option value="{{ option }}" {% if page_size == option %} selected{% endif %}>{{ option }}</option>
                 {% endfor %}
             </select>
         </div>
