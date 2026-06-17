@@ -2,7 +2,7 @@ from django.http import JsonResponse
 from django.db.models import Q
 from django.shortcuts import render
 from django.urls import reverse_lazy
-from django.views.generic import CreateView, ListView, UpdateView
+from django.views.generic import CreateView, ListView, UpdateView, DeleteView
 
 from .forms import ServidorForm
 from .models import Endereco, Servidor
@@ -108,4 +108,10 @@ class ServidorUpdateView(UpdateView):
     model = Servidor
     form_class = ServidorForm
     template_name = 'usuarios/servidor_form.html'
+    success_url = reverse_lazy('servidor_list')
+
+
+class ServidorDeleteView(DeleteView):
+    model = Servidor
+    template_name = 'usuarios/servidor_confirm_delete.html'
     success_url = reverse_lazy('servidor_list')

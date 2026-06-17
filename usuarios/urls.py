@@ -25,4 +25,7 @@ urlpatterns = [
 
     path('servidores/<int:pk>/editar/',
          views.ServidorUpdateView.as_view(), name='servidor_update'),
+
+    path('servidores/<int:pk>/excluir/',
+         views.ServidorDeleteView.as_view(), name='servidor_delete'),
 ]
