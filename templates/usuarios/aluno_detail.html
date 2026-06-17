@@ -1,0 +1,76 @@
+alunos_detail
+
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+
+    <h2>Dados do Aluno</h2>
+
+    <div class="card mt-3">
+
+        <div class="card-header">
+            Ficha do Aluno
+        </div>
+
+        <div class="card-body">
+
+            <div class="row">
+
+                <div class="col-md-6 mb-3">
+                    <strong>Nome:</strong><br>
+                    {{ aluno.nome }}
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <strong>Matrícula:</strong><br>
+                    {{ aluno.matricula }}
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <strong>CPF:</strong><br>
+                    {{ aluno.cpf }}
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <strong>Curso:</strong><br>
+                    {{ aluno.curso }}
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <strong>Email:</strong><br>
+                    {{ aluno.email }}
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <strong>Telefone:</strong><br>
+                    {{ aluno.telefone }}
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <strong>Data de Nascimento:</strong><br>
+                    {{ aluno.data_nascimento }}
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <strong>Status:</strong><br>
+                    {{ aluno.status }}
+                </div>
+
+            </div>
+
+            <a href="{% url 'aluno_list' %}" class="btn btn-secondary">
+                Voltar
+            </a>
+
+            <a href="{% url 'aluno_update' aluno.id %}"
+               class="btn btn-warning">
+                Editar
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}
