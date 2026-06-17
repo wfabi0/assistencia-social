@@ -18,7 +18,7 @@
             <label class="form-label">Resultados por página</label>
             <select name="page_size" class="form-select">
                 {% for option in page_size_options %}
-                <option value="{{ option }}" {% if page_size==option %} selected{% endif %}>{{ option }}</option>
+                <option value="{{ option }}" {% if page_size == option %} selected{% endif %}>{{ option }}</option>
                 {% endfor %}
             </select>
         </div>
@@ -100,10 +100,9 @@
                 </li>
                 {% endif %}
 
-                {% for page_number in paginator.page_range %}
-                <li class="page-item {% if page_number == page_obj.number %}active{% endif %}">
-                    <a class="page-link" href="?page={{ page_number }}&q={{ q|urlencode }}&page_size={{ page_size }}">{{
-                        page_number }}</a>
+                {% for page in paginator.page_range %}
+                <li class="page-item {% if page == page_obj.number %}active{% endif %}">
+                    <a class="page-link" href="?page={{ page }}&q={{ q|urlencode }}&page_size={{ page_size }}">{{ page }}</a>
                 </li>
                 {% endfor %}
 
