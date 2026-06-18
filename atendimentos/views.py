@@ -35,3 +35,9 @@ class AtendimentoCreateView(CreateView):
     form_class = AtendimentoForm
     template_name = "atendimentos/form.html"
     success_url = reverse_lazy("lista_atendimentos")
+
+class AtendimentoUpdateView(UpdateView):
+    model = Atendimento
+    form_class = AtendimentoForm
+    template_name = "atendimentos/form.html"
+    success_url = reverse_lazy("lista_atendimentos")
