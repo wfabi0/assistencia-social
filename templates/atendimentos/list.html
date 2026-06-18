@@ -7,6 +7,30 @@
 <body>
     <h2>Lista de Atendimentos</h2>
 
+    <!-- CAMPO DE BUSCA -->
+    <form method="get">
+        <input 
+            type="text" 
+            name="q" 
+            value="{{ request.GET.q }}" 
+            placeholder="Pesquisar por nome...">
+            <button type="submit">Buscar</button>
+    </form>
+
+    <!-- LINHAS DA TABELA -->
+    <form method="get">
+        <!-- Mantém a busca atual ao mudar a paginação -->
+        <input type="hidden" name="q" value="{{ request.GET.q }}">
+
+        <label>Resultados por página:</label>
+        <select name="por_pagina" onchange="this.form.submit()">
+            <option value="5"  {% if por_pagina == "5"  %}selected{% endif %}>5</option>
+            <option value="10" {% if por_pagina == 10   %}selected{% endif %}>10</option>
+            <option value="25" {% if por_pagina == "25" %}selected{% endif %}>25</option>
+            <option value="50" {% if por_pagina == "50" %}selected{% endif %}>50</option>
+        </select>
+    </form>
+
     <a href="{% url 'novo_atendimento' %}">+ Novo Atendimento</a>
 
     <!-- Tabela -->
@@ -48,6 +72,20 @@
             {% endfor %}
         </tbody>
     </table>
+    <!-- Paginação -->
+    {% if is_paginated %}
+        <div>
+            {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.por_pagina %}&por_pagina={{ request.GET.por_pagina }}{% endif %}">Anterior</a>
+            {% endif %}
+        
+            Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+        
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.por_pagina %}&por_pagina={{ request.GET.por_pagina }}{% endif %}">Próximo</a>
+            {% endif %}
+        </div>
+    {% endif %}
 
 </body>
 </html>
