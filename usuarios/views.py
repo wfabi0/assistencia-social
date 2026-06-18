@@ -2,35 +2,13 @@ from django.http import JsonResponse
 from django.db.models import Q
 from django.shortcuts import render
 from django.urls import reverse_lazy
-from django.views.generic import CreateView, ListView, UpdateView, DeleteView
-
-from .forms import ServidorForm
-from .models import Endereco, Servidor
+from django.views.generic import CreateView, ListView, UpdateView, DeleteView, DetailView
+from .forms import ServidorForm, AlunoForm
+from .models import Endereco, Servidor, Aluno
 
 
 def home(request):
     return render(request, 'home.html')
-
-
-def aluno_list(request):
-    return render(request, 'usuarios/aluno_list.html')
-
-
-def aluno_form(request):
-    return render(request, 'usuarios/aluno_form.html')
-
-
-def aluno_detail(request):
-    return render(request, 'usuarios/aluno_detail.html')
-
-
-def aluno_update(request, pk=None):
-    return render(request, 'usuarios/aluno_form.html')
-
-
-def aluno_historico(request, pk=None):
-    return render(request, 'usuarios/aluno_detail.html')
-
 
 def endereco_autocomplete(request):
     query = request.GET.get('q', '').strip()
@@ -56,6 +34,61 @@ def endereco_autocomplete(request):
     ]
 
     return JsonResponse({'results': results})
+
+class AlunoListView(ListView):
+    model = Aluno
+    template_name = 'usuarios/aluno_list.html'
+    context_object_name = 'alunos'
+    paginate_by = 5  
+
+    def get_paginate_by(self, queryset):
+        page_size = self.request.GET.get('page_size')
+
+        try:
+            page_size = int(page_size)
+        except (TypeError, ValueError):
+            return self.paginate_by
+
+        return page_size if page_size > 0 else self.paginate_by
+
+    def get_queryset(self):
+        queryset = Aluno.objects.select_related('endereco').order_by('nome')
+        search = self.request.GET.get('q', '').strip()
+
+        if search:
+            queryset = queryset.filter(
+                Q(nome__icontains=search)
+                | Q(ra__icontains=search)
+            )
+
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['q'] = self.request.GET.get('q', '').strip()
+        context['page_size'] = self.get_paginate_by(self.get_queryset())
+        context['page_size_options'] = [5, 10, 25, 50]
+        return context
+
+
+class AlunoCreateView(CreateView):
+    model = Aluno
+    form_class = AlunoForm
+    template_name = 'usuarios/aluno_form.html'
+    success_url = reverse_lazy('aluno_list')
+
+
+class AlunoUpdateView(UpdateView):
+    model = Aluno
+    form_class = AlunoForm
+    template_name = 'usuarios/aluno_form.html'
+    success_url = reverse_lazy('aluno_list')
+
+
+class AlunoDetailView(DetailView):
+    model = Aluno
+    template_name = 'usuarios/aluno_detail.html'
+    context_object_name = 'aluno'
 
 
 class ServidorListView(ListView):
