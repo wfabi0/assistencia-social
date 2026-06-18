@@ -14,7 +14,7 @@ class AtendimentoForm(forms.ModelForm):
             'servidor',
             'usuario_externo']
         widgets = {
-            "data": forms.DateInput(attrs={"type": "date"}),
+            "data_atendimento": forms.DateInput(attrs={"class": "datepicker"}),
             "tipo_pessoa": forms.RadioSelect(),
             "descricao": forms.Textarea(attrs={"rows": 5}),
         }

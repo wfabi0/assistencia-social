@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Atendimento</title>
+    <!-- Flatpickr CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.css">
 </head>
 <body>
     <h2>Novo Atendimento</h2>
@@ -20,10 +22,21 @@
         {% csrf_token %}
         {{ form.as_p }}
         <button type="submit">Salvar</button>
-        
     </form>
 
+    <!-- Flatpickr JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/l10n/pt.min.js"></script>
+
     <script>
+        // Date picker
+        flatpickr(".datepicker", {
+            locale: "pt",
+            dateFormat: "Y-m-d",
+            altInput: true,
+            altFormat: "d/m/Y",
+        });
+
         // Mostra/esconde campos conforme o tipo selecionado
         function atualizarCampos() {
             const tipo = document.querySelector('[name="tipo_pessoa"]:checked')?.value;
@@ -41,7 +54,6 @@
             radio.addEventListener('change', atualizarCampos);
         });
 
-        // Roda ao carregar a página
         atualizarCampos();
     </script>
 </body>
