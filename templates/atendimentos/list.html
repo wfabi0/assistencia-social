@@ -59,7 +59,7 @@
                     {% endif %}
                 </td>
                 <td>{{ atendimento.pessoa_atendida.nome }}</td>
-                <td>{{ atendimento.curso_ou_cargo }}</td>
+                <td>{{ atendimento.cargo_ou_curso }}</td>
                 <td>{{ atendimento.get_status_display }}</td>
                 <td>
                     <a href="{% url 'editar_atendimento' atendimento.pk %}" class="btn">Editar</a>
