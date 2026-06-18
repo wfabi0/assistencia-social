@@ -1,0 +1,70 @@
+<div id="{{ modal_id }}" style="display:none;">
+    <div id="{{ modal_id }}-conteudo">
+        <h3>{{ titulo }}</h3>
+        <p>Tem certeza que deseja excluir o registro abaixo?</p>
+        <ul>
+            <li><strong id="{{ modal_id }}-label1"></strong> <span id="{{ modal_id }}-valor1"></span></li>
+            <li><strong id="{{ modal_id }}-label2"></strong> <span id="{{ modal_id }}-valor2"></span></li>
+        </ul>
+        <form method="post" id="{{ modal_id }}-form">
+            {% csrf_token %}
+            <button type="submit">{{ btn_confirmar|default:"Confirmar" }}</button>
+            <button type="button" onclick="fecharModal('{{ modal_id }}')">{{ btn_cancelar|default:"Cancelar" }}</button>
+        </form>
+    </div>
+</div>
+
+<style>
+    #{{ modal_id }} {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+    }
+
+    #{{ modal_id }}-conteudo {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        min-width: 300px;
+    }
+</style>
+
+<script>
+    function abrirModal(modalId, url, label1, valor1, label2, valor2) {
+    document.getElementById(modalId + '-label1').textContent = label1;
+    document.getElementById(modalId + '-valor1').textContent = valor1;
+    document.getElementById(modalId + '-label2').textContent = label2;
+    document.getElementById(modalId + '-valor2').textContent = valor2;
+    document.getElementById(modalId + '-form').action = url;
+    document.getElementById(modalId).style.display = 'block';
+}
+    function fecharModal(modalId) {
+        document.getElementById(modalId).style.display = 'none';
+    }
+
+    document.getElementById('{{ modal_id }}').addEventListener('click', function(e) {
+        if (e.target === this) fecharModal('{{ modal_id }}');
+    });
+
+    document.querySelectorAll('.btn-excluir').forEach(btn => {
+    btn.addEventListener('click', function() {
+        abrirModal(
+            this.dataset.modal,
+            this.dataset.url,
+            this.dataset.label1,
+            this.dataset.valor1,
+            this.dataset.label2,
+            this.dataset.valor2
+        );
+    });
+});
+</script>

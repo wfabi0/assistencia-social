@@ -15,7 +15,7 @@ class Atendimento(models.Model):
         EM_ANDAMENTO = "EM_ANDAMENTO", "Em Andamento"
         CONCLUIDO = "CONCLUIDO", "Concluído"
     
-    data_atendimento = models.DateTimeField("Data do Atendimento")
+    data_atendimento = models.DateField("Data do Atendimento")
     descricao = models.TextField("Descrição do Atendimento")
     status = models.CharField(
         "Status do Atendimento",

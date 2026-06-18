@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Lista de Atendimentos</title>
+</head>
+<body>
+    <h2>Lista de Atendimentos</h2>
+
+    <!-- CAMPO DE BUSCA -->
+    <form method="get">
+        <input 
+            type="text" 
+            name="q" 
+            value="{{ request.GET.q }}" 
+            placeholder="Pesquisar por nome...">
+            <button type="submit">Buscar</button>
+    </form>
+
+    <!-- LINHAS DA TABELA -->
+    <form method="get">
+        <!-- Mantém a busca atual ao mudar a paginação -->
+        <input type="hidden" name="q" value="{{ request.GET.q }}">
+
+        <label>Resultados por página:</label>
+        <select name="por_pagina" onchange="this.form.submit()">
+            <option value="5"  {% if por_pagina == "5"  %}selected{% endif %}>5</option>
+            <option value="10" {% if por_pagina == 10   %}selected{% endif %}>10</option>
+            <option value="25" {% if por_pagina == "25" %}selected{% endif %}>25</option>
+            <option value="50" {% if por_pagina == "50" %}selected{% endif %}>50</option>
+        </select>
+    </form>
+
+    <a href="{% url 'novo_atendimento' %}" class="btn">+ Novo Atendimento</a>
+
+    <!-- Tabela -->
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Data</th>
+                <th>RA/Siape</th>
+                <th>Nome</th>
+                <th>Curso/Cargo</th>
+                <th>Status</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for atendimento in atendimentos %}
+            <tr>
+                <td>{{ atendimento.data_atendimento }}</td>
+                <td>
+                    {% if atendimento.tipo_pessoa == "ALU" %}
+                        {{ atendimento.aluno.ra }}
+                    {% elif atendimento.tipo_pessoa == "SER" %}
+                        {{ atendimento.servidor.siape }}
+                    {% else %}
+                        —
+                    {% endif %}
+                </td>
+                <td>{{ atendimento.pessoa_atendida.nome }}</td>
+                <td>{{ atendimento.cargo_ou_curso }}</td>
+                <td>{{ atendimento.get_status_display }}</td>
+                <td>
+                    <a href="{% url 'editar_atendimento' atendimento.pk %}" class="btn">Editar</a>
+                    <button
+                        class="btn-excluir"
+                        data-modal="modalExcluirAtendimento"
+                        data-url="{% url 'excluir_atendimento' atendimento.id %}"
+                        data-label1="Pessoa Atendida:"
+                        data-valor1="{{ atendimento.pessoa_atendida.nome }}"
+                        data-label2="Data do Atendimento:"
+                        data-valor2="{{ atendimento.data_atendimento }}">
+                        Excluir
+                    </button>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6">Nenhum atendimento encontrado.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <!-- Paginação -->
+    {% if is_paginated %}
+        <div>
+            {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.por_pagina %}&por_pagina={{ request.GET.por_pagina }}{% endif %}">Anterior</a>
+            {% endif %}
+        
+            Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+        
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.por_pagina %}&por_pagina={{ request.GET.por_pagina }}{% endif %}">Próximo</a>
+            {% endif %}
+        </div>
+    {% endif %}
+    {% include "components/modal.html" with modal_id="modalExcluirAtendimento" titulo="Confirmar Exclusão de Atendimento" btn_confirmar="Excluir" btn_cancelar="Cancelar" %}
+</body>
+</html>
