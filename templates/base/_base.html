@@ -34,16 +34,16 @@
                     <!-- Usuários -->
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle"
-                           href="#"
-                           role="button"
-                           data-bs-toggle="dropdown">
+                            href="#"
+                            role="button"
+                            data-bs-toggle="dropdown">
                             Usuários
                         </a>
 
                         <ul class="dropdown-menu">
                             <li>
                                 <a class="dropdown-item"
-                                   href="{% url 'aluno_list' %}">
+                                    href="{% url 'aluno_list' %}">
                                     Alunos
                                 </a>
                             </li>
@@ -58,7 +58,7 @@
 
                     <!-- Atendimentos -->
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'aluno_list' %}">
+                        <a class="nav-link" href="{% url 'lista_atendimentos' %}">
                             Atendimentos
                         </a>
                     </li>
@@ -66,9 +66,9 @@
                     <!-- Relatórios -->
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle"
-                           href="#"
-                           role="button"
-                           data-bs-toggle="dropdown">
+                            href="#"
+                            role="button"
+                            data-bs-toggle="dropdown">
                             Relatórios
                         </a>
 
@@ -88,9 +88,9 @@
 
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle"
-                           href="#"
-                           role="button"
-                           data-bs-toggle="dropdown">
+                            href="#"
+                            role="button"
+                            data-bs-toggle="dropdown">
 
                             {% if user.is_authenticated %}
                                 {{ user.username }}
