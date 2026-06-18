@@ -3,28 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <title>Lista de Atendimentos</title>
-    <style>
-        #modal {
-            display: none;
-            position: fixed;      /* fica fixo na tela */
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);  /* fundo escurecido */
-            z-index: 1000;        /* fica na frente de tudo */
-        }
-
-        #modal-conteudo {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);  /* centraliza na tela */
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-        }
-    </style>
 </head>
 <body>
     <h2>Lista de Atendimentos</h2>
@@ -85,8 +63,14 @@
                 <td>{{ atendimento.get_status_display }}</td>
                 <td>
                     <a href="{% url 'editar_atendimento' atendimento.pk %}" class="btn">Editar</a>
-                    <!-- Botão que abre o modal -->
-                    <button onclick="confirmarExclusao('{{ atendimento.pk }}', '{{ atendimento.pessoa_atendida.nome }}', '{{ atendimento.data_atendimento }}')">
+                    <button
+                        class="btn-excluir"
+                        data-modal="modalExcluirAtendimento"
+                        data-url="{% url 'excluir_atendimento' atendimento.id %}"
+                        data-label1="Pessoa Atendida:"
+                        data-valor1="{{ atendimento.pessoa_atendida.nome }}"
+                        data-label2="Data do Atendimento:"
+                        data-valor2="{{ atendimento.data_atendimento }}">
                         Excluir
                     </button>
                 </td>
@@ -112,40 +96,6 @@
             {% endif %}
         </div>
     {% endif %}
-
-    <!-- Modal de confirmação de exclusão -->
-    <div id="modal" style="display:none;">
-        <div id="modal-conteudo">
-            <h3>Confirmar Exclusão</h3>
-            <p>Tem certeza que deseja excluir o atendimento abaixo?</p>
-            <ul>
-                <li><strong>Pessoa:</strong> <span id="modal-nome"></span></li>
-                <li><strong>Data:</strong> <span id="modal-data_atendimento"></span></li>
-            </ul>
-            <form method="post" id="form-excluir">
-                {% csrf_token %}
-                <button type="submit">Confirmar</button>
-                <button type="button" onclick="fecharModal()">Cancelar</button>
-            </form>
-        </div>
-    </div>
-
-    <script>
-        function confirmarExclusao(id, nome, data) {
-            document.getElementById('modal-nome').textContent = nome;
-            document.getElementById('modal-data_atendimento').textContent = data;
-            document.getElementById('form-excluir').action = `/atendimentos/${id}/excluir/`;
-            document.getElementById('modal').style.display = 'block';
-        }
-
-        function fecharModal() {
-            document.getElementById('modal').style.display = 'none';
-        }
-
-        // Fecha o modal clicando fora dele
-        document.getElementById('modal').addEventListener('click', function(e) {
-            if (e.target === this) fecharModal();
-        });
-    </script>
+    {% include "components/modal.html" with modal_id="modalExcluirAtendimento" titulo="Confirmar Exclusão de Atendimento" btn_confirmar="Excluir" btn_cancelar="Cancelar" %}
 </body>
 </html>
