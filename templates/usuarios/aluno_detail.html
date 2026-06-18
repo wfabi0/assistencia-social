@@ -22,13 +22,8 @@
                 </div>
 
                 <div class="col-md-6 mb-3">
-                    <strong>Matrícula:</strong><br>
-                    {{ aluno.matricula }}
-                </div>
-
-                <div class="col-md-6 mb-3">
-                    <strong>CPF:</strong><br>
-                    {{ aluno.cpf }}
+                    <strong>RA:</strong><br>
+                    {{ aluno.ra }}
                 </div>
 
                 <div class="col-md-6 mb-3">
@@ -51,19 +46,13 @@
                     {{ aluno.data_nascimento }}
                 </div>
 
-                <div class="col-md-6 mb-3">
-                    <strong>Status:</strong><br>
-                    {{ aluno.status }}
-                </div>
-
             </div>
 
             <a href="{% url 'aluno_list' %}" class="btn btn-secondary">
                 Voltar
             </a>
 
-            <a href="{% url 'aluno_update' aluno.id %}"
-               class="btn btn-warning">
+            <a href="{% url 'aluno_update' aluno.id %}" class="btn btn-warning">
                 Editar
             </a>
 
