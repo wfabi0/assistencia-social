@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Lista de Atendimentos</title>
+</head>
+<body>
+    <h2>Lista de Atendimentos</h2>
+
+    <a href="{% url 'novo_atendimento' %}">+ Novo Atendimento</a>
+
+    <!-- Tabela -->
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Data</th>
+                <th>RA/Siape</th>
+                <th>Nome</th>
+                <th>Curso/Cargo</th>
+                <th>Status</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for atendimento in atendimentos %}
+            <tr>
+                <td>{{ atendimento.data_atendimento }}</td>
+                <td>
+                    {% if atendimento.tipo_pessoa == "ALU" %}
+                        {{ atendimento.aluno.ra }}
+                    {% elif atendimento.tipo_pessoa == "SER" %}
+                        {{ atendimento.servidor.siape }}
+                    {% else %}
+                        —
+                    {% endif %}
+                </td>
+                <td>{{ atendimento.pessoa_atendida.nome }}</td>
+                <td>{{ atendimento.curso_ou_cargo }}</td>
+                <td>{{ atendimento.get_status_display }}</td>
+                <td>
+
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6">Nenhum atendimento encontrado.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+</body>
+</html>

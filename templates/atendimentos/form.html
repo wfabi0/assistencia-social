@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Atendimento</title>
+</head>
+<body>
+    <h2>Novo Atendimento</h2>
+
+    <!-- Exibe erros gerais do formulário -->
+    {% if form.non_field_errors %}
+        <div style="color: red;">
+            {% for erro in form.non_field_errors %}
+                <p>{{ erro }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Salvar</button>
+        
+    </form>
+
+    <script>
+        // Mostra/esconde campos conforme o tipo selecionado
+        function atualizarCampos() {
+            const tipo = document.querySelector('[name="tipo_pessoa"]:checked')?.value;
+
+            document.getElementById('id_aluno').closest('p').style.display = 'none';
+            document.getElementById('id_servidor').closest('p').style.display = 'none';
+            document.getElementById('id_usuario_externo').closest('p').style.display = 'none';
+
+            if (tipo === 'ALU') document.getElementById('id_aluno').closest('p').style.display = 'block';
+            if (tipo === 'SER') document.getElementById('id_servidor').closest('p').style.display = 'block';
+            if (tipo === 'EXT') document.getElementById('id_usuario_externo').closest('p').style.display = 'block';
+        }
+
+        document.querySelectorAll('[name="tipo_pessoa"]').forEach(radio => {
+            radio.addEventListener('change', atualizarCampos);
+        });
+
+        // Roda ao carregar a página
+        atualizarCampos();
+    </script>
+</body>
+</html>
