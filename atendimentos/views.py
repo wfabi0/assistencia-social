@@ -41,3 +41,8 @@ class AtendimentoUpdateView(UpdateView):
     form_class = AtendimentoForm
     template_name = "atendimentos/form.html"
     success_url = reverse_lazy("lista_atendimentos")
+
+class AtendimentoDeleteView(DeleteView):
+    model = Atendimento
+    template_name = "atendimentos/confirm_delete.html"
+    success_url = reverse_lazy("lista_atendimentos")
