@@ -1,60 +1,122 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <title>Atendimento</title>
-    <!-- Flatpickr CSS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.css">
-</head>
-<body>
-    <h2>Novo Atendimento</h2>
+{% extends 'base/_layout_form.html' %}
 
-    <!-- Exibe erros gerais do formulário -->
-    {% if form.non_field_errors %}
-        <div style="color: red;">
-            {% for erro in form.non_field_errors %}
-                <p>{{ erro }}</p>
+{% block title %}Atendimento{% endblock %}
+
+{% block titulo_form %}{% if form.instance.pk %}Editar Atendimento{% else %}Novo Atendimento{% endif %}{% endblock %}
+
+{% block url_voltar %}{% url 'lista_atendimentos' %}{% endblock %}
+{% block url_cancelar %}{% url 'lista_atendimentos' %}{% endblock %}
+
+{% block campos_form %}
+    {# Data #}
+    <div class="mb-3">
+        <label class="form-label fw-bold">{{ form.data_atendimento.label }}</label>
+        {{ form.data_atendimento }}
+        {% if form.data_atendimento.errors %}
+            <div class="text-danger small mt-1">{{ form.data_atendimento.errors }}</div>
+        {% endif %}
+    </div>
+
+    {# Tipo de pessoa #}
+    <div class="mb-3">
+        <label class="form-label fw-bold">{{ form.tipo_pessoa.label }}</label>
+        <div class="d-flex flex-column flex-sm-row gap-2 gap-sm-3">
+            {% for radio in form.tipo_pessoa %}
+            <div class="form-check">
+                {{ radio.tag }}
+                <label class="form-check-label" for="{{ radio.id_for_label }}">{{ radio.choice_label }}</label>
+            </div>
             {% endfor %}
         </div>
-    {% endif %}
+        {% if form.tipo_pessoa.errors %}
+            <div class="text-danger small mt-1">{{ form.tipo_pessoa.errors }}</div>
+        {% endif %}
+    </div>
 
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Salvar</button>
-    </form>
+    {# Aluno #}
+    <div class="mb-3" id="campo-aluno" style="display:none;">
+        <label class="form-label fw-bold">{{ form.aluno.label }}</label>
+        {{ form.aluno }}
+        {% if form.aluno.errors %}
+            <div class="text-danger small mt-1">{{ form.aluno.errors }}</div>
+        {% endif %}
+    </div>
 
-    <!-- Flatpickr JS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/l10n/pt.min.js"></script>
+    {# Servidor #}
+    <div class="mb-3" id="campo-servidor" style="display:none;">
+        <label class="form-label fw-bold">{{ form.servidor.label }}</label>
+        {{ form.servidor }}
+        {% if form.servidor.errors %}
+            <div class="text-danger small mt-1">{{ form.servidor.errors }}</div>
+        {% endif %}
+    </div>
 
-    <script>
-        // Date picker
-        flatpickr(".datepicker", {
-            locale: "pt",
-            dateFormat: "Y-m-d",
-            altInput: true,
-            altFormat: "d/m/Y",
-        });
+    {# Usuário externo #}
+    <div class="mb-3" id="campo-usuario-externo" style="display:none;">
+        <label class="form-label fw-bold">{{ form.usuario_externo.label }}</label>
+        {{ form.usuario_externo }}
+        {% if form.usuario_externo.errors %}
+            <div class="text-danger small mt-1">{{ form.usuario_externo.errors }}</div>
+        {% endif %}
+    </div>
 
-        // Mostra/esconde campos conforme o tipo selecionado
-        function atualizarCampos() {
-            const tipo = document.querySelector('[name="tipo_pessoa"]:checked')?.value;
+    {# Descrição #}
+    <div class="mb-3">
+        <label class="form-label fw-bold">{{ form.descricao.label }}</label>
+        {{ form.descricao }}
+        {% if form.descricao.errors %}
+            <div class="text-danger small mt-1">{{ form.descricao.errors }}</div>
+        {% endif %}
+    </div>
 
-            document.getElementById('id_aluno').closest('p').style.display = 'none';
-            document.getElementById('id_servidor').closest('p').style.display = 'none';
-            document.getElementById('id_usuario_externo').closest('p').style.display = 'none';
+    {# Status #}
+    <div class="mb-3">
+        <label class="form-label fw-bold">{{ form.status.label }}</label>
+        {{ form.status }}
+        {% if form.status.errors %}
+            <div class="text-danger small mt-1">{{ form.status.errors }}</div>
+        {% endif %}
+    </div>
+{% endblock %}
 
-            if (tipo === 'ALU') document.getElementById('id_aluno').closest('p').style.display = 'block';
-            if (tipo === 'SER') document.getElementById('id_servidor').closest('p').style.display = 'block';
-            if (tipo === 'EXT') document.getElementById('id_usuario_externo').closest('p').style.display = 'block';
+{% block scripts_form %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/l10n/pt.min.js"></script>
+<script>
+    // Configuração do Flatpickr garantindo classes do Bootstrap no input gerado
+    const inputData = document.querySelector(".datepicker");
+    const valorDoBanco = inputData && inputData.value.trim() !== "" ? inputData.value : null;
+
+    flatpickr(".datepicker", {
+        locale: "pt",
+        dateFormat: (valorDoBanco && valorDoBanco.includes('/')) ? "d/m/Y" : "Y-m-d", 
+        altInput: true,
+        altFormat: "d/m/Y",
+        defaultDate: valorDoBanco || "today", 
+        onReady: function(selectedDates, dateStr, instance) {
+            if (instance.altInput) {
+                instance.altInput.classList.add("form-control");
+            }
         }
+    });
 
-        document.querySelectorAll('[name="tipo_pessoa"]').forEach(radio => {
-            radio.addEventListener('change', atualizarCampos);
-        });
+    function atualizarCampos() {
+        const tipo = document.querySelector('[name="tipo_pessoa"]:checked')?.value;
 
-        atualizarCampos();
-    </script>
-</body>
-</html>
+        document.getElementById('campo-aluno').style.display = 'none';
+        document.getElementById('campo-servidor').style.display = 'none';
+        document.getElementById('campo-usuario-externo').style.display = 'none';
+
+        if (tipo === 'ALU') document.getElementById('campo-aluno').style.display = 'block';
+        if (tipo === 'SER') document.getElementById('campo-servidor').style.display = 'block';
+        if (tipo === 'EXT') document.getElementById('campo-usuario-externo').style.display = 'block';
+    }
+
+    document.querySelectorAll('[name="tipo_pessoa"]').forEach(radio => {
+        radio.addEventListener('change', atualizarCampos);
+    });
+
+    atualizarCampos();
+</script>
+{% endblock %}
