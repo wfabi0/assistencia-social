@@ -1,101 +1,119 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <title>Lista de Atendimentos</title>
-</head>
-<body>
-    <h2>Lista de Atendimentos</h2>
+{% extends 'base/_layout_list.html' %}
 
-    <!-- CAMPO DE BUSCA -->
-    <form method="get">
-        <input 
-            type="text" 
-            name="q" 
-            value="{{ request.GET.q }}" 
-            placeholder="Pesquisar por nome...">
-            <button type="submit">Buscar</button>
-    </form>
+{% block title %}Lista de Atendimentos{% endblock %}
 
-    <!-- LINHAS DA TABELA -->
-    <form method="get">
-        <!-- Mantém a busca atual ao mudar a paginação -->
-        <input type="hidden" name="q" value="{{ request.GET.q }}">
+{% block titulo_lista %}Atendimentos{% endblock %}
 
-        <label>Resultados por página:</label>
-        <select name="por_pagina" onchange="this.form.submit()">
-            <option value="5"  {% if por_pagina == "5"  %}selected{% endif %}>5</option>
-            <option value="10" {% if por_pagina == 10   %}selected{% endif %}>10</option>
-            <option value="25" {% if por_pagina == "25" %}selected{% endif %}>25</option>
-            <option value="50" {% if por_pagina == "50" %}selected{% endif %}>50</option>
-        </select>
-    </form>
+{% block formulario_busca %}
+<form method="get" class="mb-3">
+    <div class="row g-2 align-items-end">
+        <div class="col-12 col-md-5">
+            <input type="search" name="q" value="{{ request.GET.q }}"
+                class="form-control" placeholder="Buscar por nome...">
+        </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-primary">Buscar</button>
+            <a href="{% url 'lista_atendimentos' %}?por_pagina={{ request.GET.por_pagina|default:'10' }}"
+                class="btn btn-outline-secondary ms-1">Limpar</a>
+        </div>
+        <div class="col-auto">
+            <select name="por_pagina" class="form-select" onchange="this.form.submit()">
+                <option value="5"  {% if por_pagina|stringformat:"s" == "5"  %}selected{% endif %}>5  / página</option>
+                <option value="10" {% if por_pagina|stringformat:"s" == "10" %}selected{% endif %}>10 / página</option>
+                <option value="25" {% if por_pagina|stringformat:"s" == "25" %}selected{% endif %}>25 / página</option>
+                <option value="50" {% if por_pagina|stringformat:"s" == "50" %}selected{% endif %}>50 / página</option>
+            </select>
+        </div>
+        <div class="col-12 col-md-auto ms-md-auto mt-2 mt-md-0">
+            <a href="{% url 'novo_atendimento' %}" class="btn btn-success w-100 w-md-auto">
+                + Novo Atendimento
+            </a>
+        </div>
+    </div>
+</form>
+{% endblock %}
 
-    <a href="{% url 'novo_atendimento' %}" class="btn">+ Novo Atendimento</a>
+{% block cabecalho_tabela %}
+    <th>Data</th>
+    <th>RA/Siape</th>
+    <th>Nome</th>
+    <th>Curso/Cargo</th>
+    <th>Status</th>
+{% endblock %}
 
-    <!-- Tabela -->
-    <table border="1">
-        <thead>
-            <tr>
-                <th>Data</th>
-                <th>RA/Siape</th>
-                <th>Nome</th>
-                <th>Curso/Cargo</th>
-                <th>Status</th>
-                <th>Ações</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for atendimento in atendimentos %}
-            <tr>
-                <td>{{ atendimento.data_atendimento }}</td>
-                <td>
-                    {% if atendimento.tipo_pessoa == "ALU" %}
-                        {{ atendimento.aluno.ra }}
-                    {% elif atendimento.tipo_pessoa == "SER" %}
-                        {{ atendimento.servidor.siape }}
-                    {% else %}
-                        —
-                    {% endif %}
-                </td>
-                <td>{{ atendimento.pessoa_atendida.nome }}</td>
-                <td>{{ atendimento.cargo_ou_curso }}</td>
-                <td>{{ atendimento.get_status_display }}</td>
-                <td>
-                    <a href="{% url 'editar_atendimento' atendimento.pk %}" class="btn">Editar</a>
-                    <button
-                        class="btn-excluir"
+{% block linhas_tabela %}
+    {% for atendimento in atendimentos %}
+    <tr>
+        <td>{{ atendimento.data_atendimento }}</td>
+        <td>
+            {% if atendimento.tipo_pessoa == "ALU" %}{{ atendimento.aluno.ra }}
+            {% elif atendimento.tipo_pessoa == "SER" %}{{ atendimento.servidor.siape }}
+            {% else %}—{% endif %}
+        </td>
+        <td>{{ atendimento.pessoa_atendida.nome }}</td>
+        <td>{{ atendimento.cargo_ou_curso }}</td>
+        <td>{{ atendimento.get_status_display }}</td>
+        <td class="text-nowrap p-2">
+            <a href="{% url 'editar_atendimento' atendimento.pk %}" class="btn btn-warning btn-sm">Editar</a>
+            <button class="btn btn-danger btn-sm"
+                    data-modal="modalExcluirAtendimento"
+                    data-url="{% url 'excluir_atendimento' atendimento.id %}"
+                    data-mensagem="Tem certeza que deseja excluir o atendimento de <strong>{{ atendimento.pessoa_atendida.nome }}</strong> realizado em {{ atendimento.data_atendimento }}?">
+                Excluir
+            </button>
+        </td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="6" class="text-center">Nenhum atendimento encontrado.</td></tr>
+    {% endfor %}
+{% endblock %}
+
+{% block cards_mobile %}
+    {% for atendimento in atendimentos %}
+    <div class="card mb-3">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <h6 class="card-title mb-0">{{ atendimento.pessoa_atendida.nome }}</h6>
+                    <small class="text-muted">{{ atendimento.data_atendimento }}</small>
+                </div>
+                {% if atendimento.status == "PENDENTE" %}
+                    <span class="badge bg-warning text-dark">{{ atendimento.get_status_display }}</span>
+                {% elif atendimento.status == "EM_ANDAMENTO" %}
+                    <span class="badge bg-primary">{{ atendimento.get_status_display }}</span>
+                {% elif atendimento.status == "CONCLUIDO" %}
+                    <span class="badge bg-success">{{ atendimento.get_status_display }}</span>
+                {% endif %}
+            </div>
+            <hr class="my-2">
+            <div class="row g-1 small text-muted">
+                <div class="col-6">
+                    {% if atendimento.tipo_pessoa == "ALU" %}RA: {{ atendimento.aluno.ra }}
+                    {% elif atendimento.tipo_pessoa == "SER" %}SIAPE: {{ atendimento.servidor.siape }}
+                    {% else %}—{% endif %}
+                </div>
+                <div class="col-6">{{ atendimento.cargo_ou_curso }}</div>
+            </div>
+            <div class="d-flex gap-2 mt-3">
+                <a href="{% url 'editar_atendimento' atendimento.pk %}"
+                    class="btn btn-warning btn-sm flex-fill">Editar</a>
+                <button class="btn btn-danger btn-sm flex-fill"
                         data-modal="modalExcluirAtendimento"
                         data-url="{% url 'excluir_atendimento' atendimento.id %}"
-                        data-label1="Pessoa Atendida:"
-                        data-valor1="{{ atendimento.pessoa_atendida.nome }}"
-                        data-label2="Data do Atendimento:"
-                        data-valor2="{{ atendimento.data_atendimento }}">
-                        Excluir
-                    </button>
-                </td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="6">Nenhum atendimento encontrado.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    <!-- Paginação -->
-    {% if is_paginated %}
-        <div>
-            {% if page_obj.has_previous %}
-                <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.por_pagina %}&por_pagina={{ request.GET.por_pagina }}{% endif %}">Anterior</a>
-            {% endif %}
-        
-            Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
-        
-            {% if page_obj.has_next %}
-                <a href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.por_pagina %}&por_pagina={{ request.GET.por_pagina }}{% endif %}">Próximo</a>
-            {% endif %}
+                        data-mensagem="Tem certeza que deseja excluir o atendimento de <strong>{{ atendimento.pessoa_atendida.nome }}</strong> realizado em {{ atendimento.data_atendimento }}?">
+                    Excluir
+                </button>
+            </div>
         </div>
-    {% endif %}
-    {% include "components/modal.html" with modal_id="modalExcluirAtendimento" titulo="Confirmar Exclusão de Atendimento" btn_confirmar="Excluir" btn_cancelar="Cancelar" %}
-</body>
-</html>
+    </div>
+    {% empty %}
+    <p class="text-center text-muted">Nenhum atendimento encontrado.</p>
+    {% endfor %}
+{% endblock %}
+
+{% block params_paginacao_first %}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.por_pagina %}&por_pagina={{ request.GET.por_pagina }}{% endif %}{% endblock %}
+{% block params_paginacao_last %}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.por_pagina %}&por_pagina={{ request.GET.por_pagina }}{% endif %}{% endblock %}
+
+{% block modais %}
+    {% include "components/modal.html" with modal_id="modalExcluirAtendimento" titulo="Confirmar Exclusão de Atendimento" btn_confirmar="Sim, Excluir" btn_cancelar="Cancelar" %}
+{% endblock %}
