@@ -19,6 +19,31 @@ class AtendimentoForm(forms.ModelForm):
             "descricao": forms.Textarea(attrs={"rows": 5}),
         }
     
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        if 'tipo_pessoa' in self.fields:
+            self.fields['tipo_pessoa'].choices = [
+                (k, v) for k, v in self.fields['tipo_pessoa'].choices if k
+            ]
+
+            # 2. Define um rádio pré-selecionado por padrão se for um formulário NOVO
+            # (Se for uma edição, ele mantém o valor que já estava salvo no banco)
+            if not self.instance.pk:
+                self.fields['tipo_pessoa'].initial = 'ALU'  # 'ALU' para Aluno, 'SER' para Servidor, etc.
+
+        # Loop de estilização do Bootstrap (continua igual)
+        for field_name, field in self.fields.items():
+            widget_type = field.widget.__class__.__name__
+            if widget_type == 'RadioSelect':
+                field.widget.attrs.update({'class': 'form-check-input'})
+            elif widget_type in ['Select', 'SelectMultiple']:
+                field.widget.attrs.update({'class': 'form-select'})
+            elif widget_type == 'DateInput':
+                field.widget.attrs.update({'class': 'form-control datepicker'})
+            else:
+                field.widget.attrs.update({'class': 'form-control'})
+    
     def clean(self):
         cleaned_data = super().clean()
         tipo_pessoa = cleaned_data.get("tipo_pessoa")

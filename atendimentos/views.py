@@ -1,7 +1,10 @@
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, ListView, UpdateView, DeleteView
+from django.http import JsonResponse
+from django.db.models import Q
 from .models import Atendimento
 from .forms import AtendimentoForm
+from usuarios.models import Aluno, Servidor, UsuarioExterno
 
 # Create your views here.
 class AtendimentoListView(ListView):
@@ -46,3 +49,40 @@ class AtendimentoDeleteView(DeleteView):
     model = Atendimento
     template_name = "atendimentos/confirm_delete.html"
     success_url = reverse_lazy("lista_atendimentos")
+
+def buscar_alunos(request):
+    q = request.GET.get("q", "").strip()
+    if len(q) < 2:
+        return JsonResponse([], safe=False)  # Retorna uma lista vazia se a consulta for muito curta
+    alunos = Aluno.objects.filter(
+        Q(nome__icontains=q) | Q(ra__icontains=q)
+    )
+    dados = [{"id": aluno.pk, "texto": f"{aluno.nome} - (RA: {aluno.ra})", "detalhe": aluno.curso} 
+            for aluno in alunos]
+    return JsonResponse(dados, safe=False)
+
+def buscar_servidores(request):
+    q = request.GET.get("q", "").strip()
+    if len(q) < 2:
+        return JsonResponse([], safe=False)
+    servidores = Servidor.objects.filter(
+        Q(nome__icontains=q) | Q(siape__icontains=q)
+    )[:8]
+    dados = [
+        {"id": s.pk, "texto": f"{s.siape} — {s.nome}", "detalhe": s.cargo}
+        for s in servidores
+    ]
+    return JsonResponse(dados, safe=False)
+
+def buscar_usuarios_externos(request):
+    q = request.GET.get("q", "").strip()
+    if len(q) < 2:
+        return JsonResponse([], safe=False)
+    usuarios = UsuarioExterno.objects.filter(
+        Q(nome__icontains=q) | Q(cpf__icontains=q)
+    )[:8]
+    dados = [
+        {"id": u.pk, "texto": u.nome, "detalhe": u.cpf}
+        for u in usuarios
+    ]
+    return JsonResponse(dados, safe=False)

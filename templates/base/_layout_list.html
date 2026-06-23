@@ -1,0 +1,65 @@
+{% extends 'base/_base.html' %}
+
+{% block content %}
+<div class="container mt-4 pb-5">
+
+    <h2 class="mb-3">{% block titulo_lista %}{% endblock %}</h2>
+
+    {% block formulario_busca %}{% endblock %}
+
+    {# Tabela desktop #}
+    <div class="d-none d-md-block">
+        <table class="table table-striped table-bordered align-middle">
+            <thead class="table-light">
+                <tr>
+                    {% block cabecalho_tabela %}{% endblock %}
+                    <th style="width: 1%;" class="text-nowrap">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% block linhas_tabela %}{% endblock %}
+            </tbody>
+        </table>
+    </div>
+
+    {# Cards mobile #}
+    <div class="d-md-none">
+        {% block cards_mobile %}{% endblock %}
+    </div>
+
+    {# Paginação #}
+    {% if is_paginated %}
+    <nav class="d-flex flex-column flex-sm-row justify-content-between align-items-center gap-2 mt-3 mp-5">
+        <small class="text-muted">
+            Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+        </small>
+        <ul class="pagination mb-0">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page=1{% block params_paginacao_first %}{% endblock %}">&laquo;</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% block params_paginacao %}{% endblock %}">&lsaquo; Anterior</a>
+            </li>
+            {% endif %}
+
+            <li class="page-item active">
+                <span class="page-link">{{ page_obj.number }}</span>
+            </li>
+
+            {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% block params_paginacao_next %}{% endblock %}">Próximo &rsaquo;</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% block params_paginacao_last %}{% endblock %}">&raquo;</a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+
+    {% block modais %}{% endblock %}
+
+</div>
+{% endblock %}

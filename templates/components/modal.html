@@ -1,16 +1,17 @@
 <div id="{{ modal_id }}" style="display:none;">
     <div id="{{ modal_id }}-conteudo">
-        <h3>{{ titulo }}</h3>
-        <p>Tem certeza que deseja excluir o registro abaixo?</p>
-        <ul>
-            <li><strong id="{{ modal_id }}-label1"></strong> <span id="{{ modal_id }}-valor1"></span></li>
-            <li><strong id="{{ modal_id }}-label2"></strong> <span id="{{ modal_id }}-valor2"></span></li>
-        </ul>
-        <form method="post" id="{{ modal_id }}-form">
-            {% csrf_token %}
-            <button type="submit">{{ btn_confirmar|default:"Confirmar" }}</button>
-            <button type="button" onclick="fecharModal('{{ modal_id }}')">{{ btn_cancelar|default:"Cancelar" }}</button>
-        </form>
+        <div id="{{ modal_id }}-header">
+            <h3>{{ titulo }}</h3>
+        </div>
+        <div id="{{ modal_id }}-body">
+            <p id="{{ modal_id }}-mensagem"></p>
+            <p id="{{ modal_id }}-aviso"><strong>Atenção:</strong> Esta ação não poderá ser desfeita.</p>
+            <form method="post" id="{{ modal_id }}-form">
+                {% csrf_token %}
+                <button type="submit">{{ btn_confirmar|default:"Confirmar" }}</button>
+                <button type="button" onclick="fecharModal('{{ modal_id }}')">{{ btn_cancelar|default:"Cancelar" }}</button>
+            </form>
+        </div>
     </div>
 </div>
 
@@ -32,21 +33,69 @@
         left: 50%;
         transform: translate(-50%, -50%);
         background: white;
-        padding: 20px;
         border-radius: 8px;
-        min-width: 300px;
+        min-width: 340px;
+        max-width: 500px;
+        overflow: hidden;
+    }
+
+    #{{ modal_id }}-header {
+        background-color: #c0392b;
+        padding: 14px 20px;
+    }
+
+    #{{ modal_id }}-header h3 {
+        color: white;
+        margin: 0;
+        font-size: 1.1rem;
+    }
+
+    #{{ modal_id }}-body {
+        padding: 20px;
+    }
+
+    #{{ modal_id }}-mensagem {
+        margin-bottom: 8px;
+        color: #333;
+    }
+
+    #{{ modal_id }}-aviso {
+        color: #2980b9;
+        font-size: 0.875rem;
+        margin-bottom: 20px;
+    }
+
+    #{{ modal_id }}-form {
+        display: flex;
+        gap: 8px;
+    }
+
+    #{{ modal_id }}-form button[type="submit"] {
+        background-color: #c0392b;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    #{{ modal_id }}-form button[type="button"] {
+        background-color: white;
+        color: #333;
+        border: 1px solid #ccc;
+        padding: 8px 16px;
+        border-radius: 4px;
+        cursor: pointer;
     }
 </style>
 
 <script>
-    function abrirModal(modalId, url, label1, valor1, label2, valor2) {
-    document.getElementById(modalId + '-label1').textContent = label1;
-    document.getElementById(modalId + '-valor1').textContent = valor1;
-    document.getElementById(modalId + '-label2').textContent = label2;
-    document.getElementById(modalId + '-valor2').textContent = valor2;
-    document.getElementById(modalId + '-form').action = url;
-    document.getElementById(modalId).style.display = 'block';
-}
+    function abrirModal(modalId, url, mensagem) {  
+        document.getElementById(modalId + '-mensagem').innerHTML = mensagem;
+        document.getElementById(modalId + '-form').action = url;
+        document.getElementById(modalId).style.display = 'block';
+    }
+
     function fecharModal(modalId) {
         document.getElementById(modalId).style.display = 'none';
     }
@@ -55,16 +104,13 @@
         if (e.target === this) fecharModal('{{ modal_id }}');
     });
 
-    document.querySelectorAll('.btn-excluir').forEach(btn => {
-    btn.addEventListener('click', function() {
-        abrirModal(
-            this.dataset.modal,
-            this.dataset.url,
-            this.dataset.label1,
-            this.dataset.valor1,
-            this.dataset.label2,
-            this.dataset.valor2
-        );
+    document.querySelectorAll('[data-modal]').forEach(btn => {
+        btn.addEventListener('click', function() {
+            abrirModal(
+                this.dataset.modal,
+                this.dataset.url,
+                this.dataset.mensagem
+            );
+        });
     });
-});
 </script>
