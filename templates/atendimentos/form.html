@@ -35,8 +35,15 @@
 
     {# Aluno #}
     <div class="mb-3" id="campo-aluno" style="display:none;">
-        <label class="form-label fw-bold">{{ form.aluno.label }}</label>
-        {{ form.aluno }}
+        <label class="form-label fw-bold">Aluno</label>
+        {# Campo hidden que o Django lê no POST (substitui o <select>) #}
+        <input type="hidden" name="aluno" id="id_aluno"
+                value="{{ form.instance.aluno_id|default:'' }}">
+        <input type="text" id="busca-aluno" class="form-control"
+                placeholder="Digite nome ou RA..."
+                autocomplete="off"
+                value="{% if form.instance.aluno %}{{ form.instance.aluno.ra }} — {{ form.instance.aluno.nome }}{% endif %}">
+        <div id="dropdown-aluno" class="autocomplete-dropdown list-group mt-1 shadow-sm" style="display:none;"></div>
         {% if form.aluno.errors %}
             <div class="text-danger small mt-1">{{ form.aluno.errors }}</div>
         {% endif %}
@@ -44,17 +51,29 @@
 
     {# Servidor #}
     <div class="mb-3" id="campo-servidor" style="display:none;">
-        <label class="form-label fw-bold">{{ form.servidor.label }}</label>
-        {{ form.servidor }}
+        <label class="form-label fw-bold">Servidor</label>
+        <input type="hidden" name="servidor" id="id_servidor"
+                value="{{ form.instance.servidor_id|default:'' }}">
+        <input type="text" id="busca-servidor" class="form-control"
+                placeholder="Digite nome ou SIAPE..."
+                autocomplete="off"
+                value="{% if form.instance.servidor %}{{ form.instance.servidor.siape }} — {{ form.instance.servidor.nome }}{% endif %}">
+        <div id="dropdown-servidor" class="autocomplete-dropdown list-group mt-1 shadow-sm" style="display:none;"></div>
         {% if form.servidor.errors %}
             <div class="text-danger small mt-1">{{ form.servidor.errors }}</div>
         {% endif %}
     </div>
 
-    {# Usuário externo #}
+    {# Usuário Externo #}
     <div class="mb-3" id="campo-usuario-externo" style="display:none;">
-        <label class="form-label fw-bold">{{ form.usuario_externo.label }}</label>
-        {{ form.usuario_externo }}
+        <label class="form-label fw-bold">Usuário Externo</label>
+        <input type="hidden" name="usuario_externo" id="id_usuario_externo"
+                value="{{ form.instance.usuario_externo_id|default:'' }}">
+        <input type="text" id="busca-usuario-externo" class="form-control"
+                placeholder="Digite nome ou CPF..."
+                autocomplete="off"
+                value="{% if form.instance.usuario_externo %}{{ form.instance.usuario_externo.nome }}{% endif %}">
+        <div id="dropdown-usuario-externo" class="autocomplete-dropdown list-group mt-1 shadow-sm" style="display:none;"></div>
         {% if form.usuario_externo.errors %}
             <div class="text-danger small mt-1">{{ form.usuario_externo.errors }}</div>
         {% endif %}
@@ -83,6 +102,42 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/l10n/pt.min.js"></script>
+
+<style>
+    .autocomplete-dropdown {
+        position: relative;
+        z-index: 1000;
+        width: 100%;
+        max-height: 260px;
+        overflow-y: auto;
+        border-radius: 0.375rem;
+    }
+    /* Garante que o pai tenha position relative para o dropdown se posicionar bem */
+    .autocomplete-wrapper {
+        position: relative;
+    }
+    .autocomplete-dropdown .list-group-item {
+        cursor: pointer;
+        border-left: none;
+        border-right: none;
+    }
+    .autocomplete-dropdown .list-group-item:first-child {
+        border-top: none;
+    }
+    .autocomplete-dropdown .list-group-item:hover,
+    .autocomplete-dropdown .list-group-item:focus {
+        background-color: #f0f4ff;
+    }
+    .autocomplete-dropdown .item-detalhe {
+        font-size: 0.8rem;
+        color: #6c757d;
+    }
+    .autocomplete-dropdown .item-cadastrar {
+        color: #0d6efd;
+        font-weight: 500;
+    }
+</style>
+
 <script>
     // Configuração do Flatpickr garantindo classes do Bootstrap no input gerado
     const inputData = document.querySelector(".datepicker");
@@ -118,5 +173,118 @@
     });
 
     atualizarCampos();
+
+    // Função para buscar e exibir resultados de autocomplete
+
+    /**
+     * @param {string} inputId       - id do <input type="text"> de busca
+     * @param {string} hiddenId      - id do <input type="hidden"> que vai no POST
+     * @param {string} dropdownId    - id da <div> do dropdown
+     * @param {string} endpointUrl   - URL do endpoint de busca AJAX
+     * @param {string} urlCadastro   - URL para abrir o cadastro caso não haja resultado
+     */
+
+    function criarAutocomplete(inputId, hiddenId, dropdownId, endpointUrl, urlCadastro) {
+        const input = document.getElementById(inputId);
+        const hiddenInput = document.getElementById(hiddenId);
+        const dropdown = document.getElementById(dropdownId);
+
+        let debounceTimeout = null;
+
+        input.parentElement.style.position = 'relative';
+
+        input.addEventListener('input', () => {
+            clearTimeout(debounceTimeout);
+            const q = input.value.trim();
+
+            hiddenInput.value = ''; // Limpa o hidden sempre que o usuário digitar algo novo
+
+            if (q.length < 2) {
+                fecharDropdown(dropdown);
+                return;
+            }
+        
+            debounceTimeout =setTimeout(() => buscar(q), 300);
+        });
+        document.addEventListener('click', (e) => {
+            if (!input.contains(e.target) && !dropdown.contains(e.target)) {
+                fecharDropdown(dropdown);
+            }
+        });
+
+        function buscar(q) {
+            fetch(`${endpointUrl}?q=${encodeURIComponent(q)}`)
+                .then(r => r.json())
+                .then(dados => renderizar(dados, q))
+                .catch(() => fecharDropdown());
+        }
+
+        function renderizar(dados, q) {
+            dropdown.innerHTML = '';
+            
+            if (dados.length > 0) {
+                dados.forEach(item => {
+                    const el = document.createElement('button');
+                    el.type = 'button';
+                    el.className = 'list-group-item list-group-item-action';
+                    el.innerHTML = `
+                        <div class="fw-semibold">${item.texto}</div>
+                        <div class="item-detalhe">${item.detalhe}</div>
+                    `;
+                    el.addEventListener('click', () => selecionar(item));
+                    dropdown.appendChild(el);
+                });
+            } else {
+                const el = document.createElement('div');
+                el.style.cssText = 'padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px;';
+                el.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 8px; color: var(--color-text-secondary); font-size: 14px;">
+                        <i class="ti ti-search-off" style="font-size: 16px;" aria-hidden="true"></i>
+                        Nenhum resultado para <strong style="color: var(--color-text-primary);">"${q}"</strong>
+                    </div>
+                    <button type="button"
+                        onclick="window.location.href='${urlCadastro}'"
+                        style="display: inline-flex; align-items: center; gap: 5px; font-size: 13px; font-weight: 500;
+                                color: var(--color-text-info); background: var(--color-background-info);
+                                padding: 4px 10px; border-radius: var(--border-radius-md);
+                                border: 0.5px solid var(--color-border-info); cursor: pointer; white-space: nowrap;">
+                        <i class="ti ti-plus" style="font-size: 14px;" aria-hidden="true"></i>
+                        Cadastrar novo
+                    </button>
+                `;
+                dropdown.appendChild(el);
+            }
+            dropdown.style.display = 'block';
+        }
+
+            function selecionar(item) {
+                input.value = item.texto;
+                hiddenInput.value = item.id;
+                fecharDropdown();
+            }
+
+            function fecharDropdown() {
+                dropdown.style.display = 'none';
+                dropdown.innerHTML = '';
+            }
+    }
+    criarAutocomplete(
+        'busca-aluno', 'id_aluno', 'dropdown-aluno',
+        "{% url 'buscar_alunos' %}",
+        "{% url 'aluno_create' %}"
+    );
+    
+    criarAutocomplete(
+        'busca-servidor', 'id_servidor', 'dropdown-servidor',
+        "{% url 'buscar_servidores' %}",
+        "{% url 'servidor_create' %}"
+    );
+    
+    criarAutocomplete(
+        'busca-usuario-externo', 'id_usuario_externo', 'dropdown-usuario-externo',
+        "{% url 'buscar_usuarios_externos' %}",
+        "{# url 'novo_usuario_externo' #}"
+    );
+
 </script>
 {% endblock %}
