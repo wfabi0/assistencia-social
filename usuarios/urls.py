@@ -4,19 +4,17 @@ from . import views
 urlpatterns = [
     path('', views.home, name='home'),
 
-    path('alunos/', views.aluno_list, name='aluno_list'),
-
-    path('alunos/novo/', views.aluno_form, name='aluno_create'),
-
-    path('alunos/<int:pk>/', views.aluno_detail, name='aluno_detail'),
-
-    path('alunos/<int:pk>/editar/', views.aluno_update, name='aluno_update'),
-
-    path('alunos/<int:pk>/historico/',
-         views.aluno_historico, name='aluno_historico'),
-
     path('enderecos/busca/', views.endereco_autocomplete,
          name='endereco_autocomplete'),
+
+    path('alunos/', views.AlunoListView.as_view(), name='aluno_list'),
+
+    path('alunos/novo/', views.AlunoCreateView.as_view(), name='aluno_create'),
+
+    path('alunos/<int:pk>/', views.AlunoDetailView.as_view(), name='aluno_detail'),
+
+    path('alunos/<int:pk>/editar/', views.AlunoUpdateView.as_view(), name='aluno_update'),
+    
 
     path('servidores/', views.ServidorListView.as_view(), name='servidor_list'),
 
@@ -28,4 +26,5 @@ urlpatterns = [
 
     path('servidores/<int:pk>/excluir/',
          views.ServidorDeleteView.as_view(), name='servidor_delete'),
+
 ]

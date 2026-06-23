@@ -36,19 +36,39 @@ Siga os passos abaixo para configurar o ambiente de desenvolvimento:
    pip install -r requirements.txt
    ```
 
-4. **Realize as migrações do banco de dados**:
+4. **Configure as variáveis de ambiente**:
+
+   ```bash
+   cp .env.exemple .env
+   ```
+
+   Edite o arquivo `.env` e configure as variáveis com suas informações do banco de dados:
+
+   ```env
+   SECRET_KEY=sua-chave-aqui
+   DEBUG=True
+   DB_NAME=assistencia_social
+   DB_USER=root
+   DB_PASSWORD=sua_senha_aqui
+   DB_HOST=localhost
+   DB_PORT=3306
+   ```
+
+   > **Nota:** Nunca commite o arquivo `.env` com dados sensíveis. Use o `.env.exemple` como template. NÃO APAGUE O `.env.example`.
+
+5. **Realize as migrações do banco de dados**:
 
    ```bash
    python manage.py migrate
    ```
 
-5. **Inicie o servidor de desenvolvimento**:
+6. **Inicie o servidor de desenvolvimento**:
 
    ```bash
    python manage.py runserver
    ```
 
-6. **Acesse o sistema**:
+7. **Acesse o sistema**:
    Abra o navegador e vá para http://127.0.0.1:8000.
 
 ---
