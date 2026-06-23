@@ -57,7 +57,7 @@ def buscar_alunos(request):
     alunos = Aluno.objects.filter(
         Q(nome__icontains=q) | Q(ra__icontains=q)
     )
-    dados = [{"id": aluno.pk, "texto": f"{aluno.nome} - (RA: {aluno.ra}) - {aluno.curso}"} 
+    dados = [{"id": aluno.pk, "texto": f"{aluno.nome} - (RA: {aluno.ra})", "detalhe": aluno.curso} 
             for aluno in alunos]
     return JsonResponse(dados, safe=False)
 
