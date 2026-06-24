@@ -84,11 +84,29 @@ class AlunoUpdateView(UpdateView):
     template_name = 'usuarios/aluno_form.html'
     success_url = reverse_lazy('aluno_list')
 
-
-class AlunoDetailView(DetailView):
+class HistoricoAlunoView(DetailView):
     model = Aluno
-    template_name = 'usuarios/aluno_detail.html'
-    context_object_name = 'aluno'
+    template_name = 'atendimentos/historico.html'
+    context_object_name = 'pessoa'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['atendimentos'] = self.object.atendimentos.all()
+        context['tipo_pessoa'] = 'Aluno'
+        return context
+
+
+class HistoricoServidorView(DetailView):
+    model = Servidor
+    template_name = 'atendimentos/historico.html'
+    context_object_name = 'pessoa'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['atendimentos'] = self.object.atendimentos.all()
+        context['tipo_pessoa'] = 'Servidor'
+        return context
+
 
 
 class ServidorListView(ListView):

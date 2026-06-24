@@ -11,10 +11,11 @@ urlpatterns = [
 
     path('alunos/novo/', views.AlunoCreateView.as_view(), name='aluno_create'),
 
-    path('alunos/<int:pk>/', views.AlunoDetailView.as_view(), name='aluno_detail'),
+    path('alunos/<int:pk>/historico/', views.HistoricoAlunoView.as_view(), name='aluno_detail'),
 
     path('alunos/<int:pk>/editar/', views.AlunoUpdateView.as_view(), name='aluno_update'),
-    
+
+    path('servidores/<int:pk>/historico/', views.HistoricoServidorView.as_view(), name='servidor_detail'),
 
     path('servidores/', views.ServidorListView.as_view(), name='servidor_list'),
 
