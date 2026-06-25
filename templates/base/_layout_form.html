@@ -25,9 +25,7 @@
                         {% block campos_form %}{% endblock %}
                         <div class="d-flex gap-2 mt-4">
                             <button type="submit" class="btn btn-success">Salvar</button>
-                            <a href="{% block url_voltar %}{% endblock %}" class="btn btn-outline-secondary">
-                                Voltar
-                            </a>
+                            <a href="javascript:history.back()" class="btn btn-outline-secondary">Voltar</a>
                         </div>
                     </form>
                 </div>
