@@ -26,5 +26,10 @@ urlpatterns = [
 
     path('servidores/<int:pk>/excluir/',
          views.ServidorDeleteView.as_view(), name='servidor_delete'),
-
+     
+     path('usuarios-externos/', views.UsuarioExternoListView.as_view(), name='usuario_externo_list'),
+     path('usuarios-externos/novo/', views.UsuarioExternoCreateView.as_view(), name='usuario_externo_create'),
+     path('usuarios-externos/<int:pk>/editar/', views.UsuarioExternoUpdateView.as_view(), name='usuario_externo_update'),
+     path('usuarios-externos/<int:pk>/excluir/', views.UsuarioExternoDeleteView.as_view(), name='usuario_externo_delete'),
+     path('usuarios-externos/<int:pk>/', views.UsuarioExternoDetailView.as_view(), name='usuario_externo_detail'),
 ]

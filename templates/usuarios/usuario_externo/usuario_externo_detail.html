@@ -1,0 +1,52 @@
+{% extends 'base/_layout_detail.html' %}
+
+{% block titulo_detail %}Dados do Usuário Externo{% endblock %}
+{% block subtitulo_detail %}Ficha do Usuário Externo{% endblock %}
+
+{% block campos_detail %}
+    <div class="col-md-6 mb-3">
+        <p class="fw-bold mb-1">Nome:</p>
+        <p class="mb-0">{{ object.nome }}</p>
+    </div>
+
+    <div class="col-md-6 mb-3">
+        <p class="fw-bold mb-1">CPF:</p>
+        <p class="mb-0">{{ object.cpf }}</p>
+    </div>
+
+    <div class="col-md-6 mb-3">
+        <p class="fw-bold mb-1">Data de Nascimento:</p>
+        <p class="mb-0">{{ object.data_nascimento|date:"d \d\e F \d\e Y" }}</p>
+    </div>
+
+    <div class="col-md-6 mb-3">
+        <p class="fw-bold mb-1">Email:</p>
+        <p class="mb-0">{{ object.email|default:"—" }}</p>
+    </div>
+
+    <div class="col-md-6 mb-3">
+        <p class="fw-bold mb-1">Telefone:</p>
+        <p class="mb-0">{{ object.telefone|default:"—" }}</p>
+    </div>
+
+    <div class="col-md-6 mb-3">
+        <p class="fw-bold mb-1">Endereço:</p>
+        <p class="mb-0">{{ object.endereco|default:"—" }}</p>
+    </div>
+{% endblock %}
+
+{% block acoes_detail %}
+    <a href="javascript:history.back()" class="btn btn-secondary">Voltar</a>
+    <a href="{% url 'usuario_externo_update' object.pk %}" class="btn btn-warning">Editar</a>
+    <button class="btn btn-danger"
+            data-modal="modalExcluirUsuarioExterno"
+            data-url="{% url 'usuario_externo_delete' object.pk %}"
+            data-mensagem="Tem certeza que deseja excluir <strong>{{ object.nome }}</strong>?">
+        Excluir
+    </button>
+    <a href="{# url para o historico #}" class="btn btn-info">Histórico</a>
+{% endblock %}
+
+{% block extra_detail %}
+    {% include 'components/modal.html' with modal_id='modalExcluirUsuarioExterno' titulo="Confirmar Exclusão de Usuário Externo" %}
+{% endblock %}
