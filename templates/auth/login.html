@@ -1,0 +1,129 @@
+{% extends 'base/_base.html' %}
+{% block title %}Login{% endblock %}
+{% block content %}
+<div class="login-page">
+    <div class="login-wrap">
+
+        <!-- Sidebar esquerdo -->
+        <div class="login-side">
+            <div>
+                <div class="side-logo">
+                    <i class="ti ti-building-community" aria-hidden="true"></i>
+                </div>
+                <p class="side-title">Sistema de Assistência Social</p>
+                <p class="side-sub">Plataforma integrada de gestão social municipal</p>
+            </div>
+            <div class="side-features">
+                <div class="side-feat"><span class="side-feat-dot"></span>Gestão de beneficiários</div>
+                <div class="side-feat"><span class="side-feat-dot"></span>Acompanhamento familiar</div>
+                <div class="side-feat"><span class="side-feat-dot"></span>Relatórios e indicadores</div>
+                <div class="side-feat"><span class="side-feat-dot"></span>Atendimentos e visitas</div>
+            </div>
+            <p class="side-footer">Acesso restrito a servidores autorizados</p>
+        </div>
+
+        <!-- Formulário principal -->
+        <div class="login-main">
+            <div class="login-inner">
+
+                <span class="login-kicker">
+                    <i class="ti ti-shield-lock" aria-hidden="true"></i>
+                    Acesso seguro
+                </span>
+
+                <h1 class="login-heading">Bem-vindo de volta</h1>
+                <p class="login-sub">Entre com suas credenciais para acessar o painel.</p>
+
+                <div class="badge-row">
+                    <span class="badge-pill">
+                        <i class="ti ti-lock" aria-hidden="true"></i> Criptografado
+                    </span>
+                    <span class="badge-pill">
+                        <i class="ti ti-shield-check" aria-hidden="true"></i> Ambiente seguro
+                    </span>
+                </div>
+
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger login-alert">
+                        {% for erro in form.non_field_errors %}
+                            <p class="mb-0">{{ erro }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <form method="post" class="login-form">
+                    {% csrf_token %}
+
+                    <div class="login-field">
+                        <label for="id_username">
+                            <i class="ti ti-user" aria-hidden="true"></i>
+                            {{ form.username.label }}
+                        </label>
+                        {{ form.username }}
+                        {% if form.username.errors %}
+                            <div class="field-error">{{ form.username.errors|join:", " }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="login-field">
+                        <label for="id_password">
+                            <i class="ti ti-lock" aria-hidden="true"></i>
+                            {{ form.password.label }}
+                        </label>
+                        <div class="password-wrapper">
+                            {{ form.password }}
+                            <button type="button" class="toggle-password" aria-label="Mostrar senha" onclick="togglePassword()">
+                                <i class="ti ti-eye" id="toggle-icon" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                        {% if form.password.errors %}
+                            <div class="field-error">{{ form.password.errors|join:", " }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="forgot-row">
+                        <a href="#" class="forgot-link">Esqueci minha senha</a>
+                    </div>
+
+                    {% if next %}
+                        <input type="hidden" name="next" value="{{ next }}">
+                    {% endif %}
+
+                    <button type="submit" class="submit-btn">
+                        <i class="ti ti-login" aria-hidden="true"></i>
+                        Entrar no sistema
+                    </button>
+                </form>
+
+                <div class="login-divider">
+                    <span></span>
+                    <p>ou</p>
+                    <span></span>
+                </div>
+
+                <div class="back-link">
+                    <a href="{% url 'home' %}">
+                        <i class="ti ti-arrow-left" aria-hidden="true"></i>
+                        Voltar à página inicial
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function togglePassword() {
+    const input = document.getElementById('id_password');
+    const icon = document.getElementById('toggle-icon');
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.replace('ti-eye', 'ti-eye-off');
+    } else {
+        input.type = 'password';
+        icon.classList.replace('ti-eye-off', 'ti-eye');
+    }
+}
+</script>
+{% endblock %}

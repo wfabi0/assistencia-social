@@ -103,9 +103,12 @@
 
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li>
-                                <a class="dropdown-item" href="#">
-                                    Sair
-                                </a>
+                                <form method="post" action="{% url 'logout' %}" class="m-0">
+                                    {% csrf_token %}
+                                    <button type="submit" class="dropdown-item">
+                                        Sair
+                                    </button>
+                                </form>
                             </li>
                         </ul>
 
