@@ -11,13 +11,11 @@ from .forms import ServidorForm, AlunoForm
 from .models import Endereco, Servidor, Aluno
 from .forms import ServidorForm, AlunoForm, UsuarioExternoForm
 from .models import Endereco, Servidor, Aluno, UsuarioExterno
+from django.views.generic.list import MultipleObjectMixin
 
 
 class CustomPermissionMixin(PermissionRequiredMixin):
-    """
-    Mixin que redireciona para a home com uma mensagem de erro 
-    caso o usuário não tenha a permissão necessária.
-    """
+
     def handle_no_permission(self):
         messages.error(self.request, "Você não tem permissão para acessar esta área.")
         return redirect('home')
@@ -85,28 +83,33 @@ class AlunoUpdateView(LoginRequiredMixin, CustomPermissionMixin, UpdateView):
     template_name = 'usuarios/aluno_form.html'
     success_url = reverse_lazy('aluno_list')
 
-class HistoricoAlunoView(LoginRequiredMixin, CustomPermissionMixin, DetailView):
+class HistoricoAlunoView(LoginRequiredMixin, CustomPermissionMixin, MultipleObjectMixin, DetailView):
     permission_required = 'usuarios.view_aluno'
     model = Aluno
     template_name = 'atendimentos/historico.html'
     context_object_name = 'pessoa'
+    paginate_by = 5
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['atendimentos'] = self.object.atendimentos.all()
+        object_list = self.object.atendimentos.all()
+        context = super().get_context_data(object_list=object_list, **kwargs)
+        
+        context['atendimentos'] = context['object_list']
         context['tipo_pessoa'] = 'Aluno'
         return context
 
 
-class HistoricoServidorView(LoginRequiredMixin, CustomPermissionMixin, DetailView):
+class HistoricoServidorView(LoginRequiredMixin, CustomPermissionMixin, MultipleObjectMixin, DetailView):
     permission_required = 'usuarios.view_servidor'
     model = Servidor
     template_name = 'atendimentos/historico.html'
     context_object_name = 'pessoa'
+    paginate_by = 5
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['atendimentos'] = self.object.atendimentos.all()
+        object_list = self.object.atendimentos.all()
+        context = super().get_context_data(object_list=object_list, **kwargs)
+        context['atendimentos'] = context['object_list']
         context['tipo_pessoa'] = 'Servidor'
         return context
 

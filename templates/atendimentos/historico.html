@@ -69,13 +69,13 @@
                 <tbody>
                     {% for atendimento in atendimentos %}
                     <tr>
-                        <<td>{{ atendimento.data_atendimento|date:"d/m/Y" }}</td>
+                        <td>{{ atendimento.data_atendimento|date:"d/m/Y" }}</td>
                         <td>{{ atendimento.descricao }}</td>
                         <td>
                             <span class="badge bg-secondary">{{ atendimento.status }}</span>
                         </td>
                         <td>
-                            <a href="#" class="btn btn-warning btn-sm">Editar</a>
+                            <a href="{% url 'editar_atendimento' atendimento.id %}" class="btn btn-warning btn-sm">Editar</a>
                         </td>
                     </tr>
                     {% empty %}
@@ -87,6 +87,51 @@
                     {% endfor %}
                 </tbody>
             </table>
+     
+
+            {% if page_obj.has_other_pages %}
+            <div class="d-flex justify-content-end mt-3">
+                <nav aria-label="Navegação de páginas dos atendimentos">
+                    <ul class="pagination mb-0">
+                        
+                        {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">Anterior</span>
+                        </li>
+                        {% endif %}
+
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                            <li class="page-item active" aria-current="page">
+                                <span class="page-link">{{ num }}</span>
+                            </li>
+                            {% else %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                            </li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}">Próximo</a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">Próximo</span>
+                        </li>
+                        {% endif %}
+                        
+                    </ul>
+                </nav>
+            </div>
+            {% endif %}
+            </div> 
+
         </div>
     </div>
 
