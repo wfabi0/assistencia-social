@@ -77,6 +77,10 @@ class AlunoCreateView(LoginRequiredMixin, CustomPermissionMixin, CreateView):
     form_class = AlunoForm
     template_name = 'usuarios/aluno_form.html'
     success_url = reverse_lazy('aluno_list')
+    
+    def form_valid(self, form):
+        messages.success(self.request, 'Aluno cadastrado com sucesso!')
+        return super().form_valid(form)
 
 class AlunoUpdateView(LoginRequiredMixin, CustomPermissionMixin, UpdateView):
     permission_required = 'usuarios.change_aluno'
@@ -84,6 +88,20 @@ class AlunoUpdateView(LoginRequiredMixin, CustomPermissionMixin, UpdateView):
     form_class = AlunoForm
     template_name = 'usuarios/aluno_form.html'
     success_url = reverse_lazy('aluno_list')
+    
+    def form_valid(self, form):
+        messages.success(self.request, 'Aluno atualizado com sucesso!')
+        return super().form_valid(form)
+
+class AlunoDeleteView(LoginRequiredMixin, CustomPermissionMixin, DeleteView):
+    permission_required = 'usuarios.delete_aluno'
+    model = Aluno
+    template_name = 'usuarios/aluno_confirm_delete.html'
+    success_url = reverse_lazy('aluno_list')
+    
+    def form_valid(self, form):
+        messages.success(self.request, 'Aluno removido com sucesso!')
+        return super().form_valid(form)
 
 class HistoricoAlunoView(LoginRequiredMixin, CustomPermissionMixin, ListView):
     permission_required = 'usuarios.view_aluno'
@@ -142,6 +160,10 @@ class ServidorCreateView(LoginRequiredMixin, CustomPermissionMixin, CreateView):
     form_class = ServidorForm
     template_name = 'usuarios/servidor_form.html'
     success_url = reverse_lazy('servidor_list')
+    
+    def form_valid(self, form):
+        messages.success(self.request, "Servidor cadastrado com sucesso!")
+        return super().form_valid(form)
 
 class ServidorUpdateView(LoginRequiredMixin, CustomPermissionMixin, UpdateView):
     permission_required = 'usuarios.change_servidor'
@@ -149,12 +171,20 @@ class ServidorUpdateView(LoginRequiredMixin, CustomPermissionMixin, UpdateView):
     form_class = ServidorForm
     template_name = 'usuarios/servidor_form.html'
     success_url = reverse_lazy('servidor_list')
+    
+    def form_valid(self, form):
+        messages.success(self.request, 'Servidor atualizado com sucesso!')
+        return super().form_valid(form)
 
 class ServidorDeleteView(LoginRequiredMixin, CustomPermissionMixin, DeleteView):
     permission_required = 'usuarios.delete_servidor'
     model = Servidor
     template_name = 'usuarios/servidor_confirm_delete.html'
     success_url = reverse_lazy('servidor_list')
+    
+    def form_valid(self, form):
+        messages.success(self.request, 'Servidor removido com sucesso!')
+        return super().form_valid(form)
 
 def login_view(request):
     if request.user.is_authenticated: return redirect('home')
@@ -220,15 +250,27 @@ class UsuarioExternoCreateView(LoginRequiredMixin, CustomPermissionMixin, Create
     template_name = 'usuarios/usuario_externo/usuario_externo_form.html'
     success_url = reverse_lazy('usuario_externo_list')
     
+    def form_valid(self, form):
+        messages.success(self.request, 'Usuário Externo cadastrado com sucesso!')
+        return super().form_valid(form)
+    
 class UsuarioExternoUpdateView(LoginRequiredMixin, CustomPermissionMixin, UpdateView):
     permission_required = 'usuarios.change_usuarioexterno'
     model = UsuarioExterno
     form_class = UsuarioExternoForm
     template_name = 'usuarios/usuario_externo/usuario_externo_form.html'
     success_url = reverse_lazy('usuario_externo_list')
+    
+    def form_valid(self, form):
+        messages.success(self.request, 'Usuário Externo atualizado com sucesso!')
+        return super().form_valid(form)
 
 class UsuarioExternoDeleteView(LoginRequiredMixin, CustomPermissionMixin, DeleteView):
     permission_required = 'usuarios.delete_usuarioexterno'
     model = UsuarioExterno
     template_name = 'usuarios/usuario_externo_confirm_delete.html'
     success_url = reverse_lazy('usuario_externo_list')
+    
+    def form_valid(self, form):
+        messages.success(self.request, 'Usuário Externo removido com sucesso!')
+        return super().form_valid(form)
