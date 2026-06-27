@@ -1,24 +1,25 @@
 {% extends 'base/_base.html' %}
 
 {% block content %}
-<div class="container mt-4 pb-5">
+<div class="container mt-4 pb-5 form-page">
     <div class="row justify-content-center">
-        <div class="col-12 col-md-8 col-lg-6">
+        <div class="col-12 col-md-8 col-lg-6 form-shell">
 
-            <div class="d-flex align-items-center gap-2 mb-4">
-                
-                <h2 class="mb-0">{% block titulo_form %}{% endblock %}</h2>
+            <div class="form-header mb-4">
+                <div class="form-kicker">Sistema de Assistência Social</div>
+                <h2 class="mb-1">{% block titulo_form %}{% endblock %}</h2>
+                {% block subtitulo_form %}{% endblock %}
             </div>
 
             {% if form.non_field_errors %}
-            <div class="alert alert-danger">
-                {% for erro in form.non_field_errors %}
-                    <p class="mb-0">{{ erro }}</p>
-                {% endfor %}
-            </div>
+                <div class="alert alert-danger form-alert">
+                    {% for erro in form.non_field_errors %}
+                        <p class="mb-0">{{ erro }}</p>
+                    {% endfor %}
+                </div>
             {% endif %}
 
-            <div class="card">
+            <div class="card form-card">
                 <div class="card-body">
                     <form method="post">
                         {% csrf_token %}
