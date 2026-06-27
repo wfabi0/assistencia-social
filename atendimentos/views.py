@@ -2,12 +2,16 @@ from django.urls import reverse_lazy
 from django.views.generic import CreateView, ListView, UpdateView, DeleteView
 from django.http import JsonResponse
 from django.db.models import Q
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib import messages
 from .models import Atendimento
 from .forms import AtendimentoForm
 from usuarios.models import Aluno, Servidor, UsuarioExterno
 
 # Create your views here.
-class AtendimentoListView(ListView):
+class AtendimentoListView(LoginRequiredMixin, ListView):
     model = Atendimento
     template_name = "atendimentos/list.html"
     context_object_name = "atendimentos"
@@ -33,23 +37,24 @@ class AtendimentoListView(ListView):
             )
         return queryset.order_by("-data_atendimento")
 
-class AtendimentoCreateView(CreateView):
+class AtendimentoCreateView(LoginRequiredMixin, CreateView):
     model = Atendimento
     form_class = AtendimentoForm
     template_name = "atendimentos/form.html"
     success_url = reverse_lazy("lista_atendimentos")
 
-class AtendimentoUpdateView(UpdateView):
+class AtendimentoUpdateView(LoginRequiredMixin, UpdateView):
     model = Atendimento
     form_class = AtendimentoForm
     template_name = "atendimentos/form.html"
     success_url = reverse_lazy("lista_atendimentos")
 
-class AtendimentoDeleteView(DeleteView):
+class AtendimentoDeleteView(LoginRequiredMixin, DeleteView):
     model = Atendimento
     template_name = "atendimentos/confirm_delete.html"
     success_url = reverse_lazy("lista_atendimentos")
 
+@login_required
 def buscar_alunos(request):
     q = request.GET.get("q", "").strip()
     if len(q) < 2:
@@ -61,6 +66,7 @@ def buscar_alunos(request):
             for aluno in alunos]
     return JsonResponse(dados, safe=False)
 
+@login_required
 def buscar_servidores(request):
     q = request.GET.get("q", "").strip()
     if len(q) < 2:
@@ -74,6 +80,7 @@ def buscar_servidores(request):
     ]
     return JsonResponse(dados, safe=False)
 
+@login_required
 def buscar_usuarios_externos(request):
     q = request.GET.get("q", "").strip()
     if len(q) < 2:
