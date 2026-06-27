@@ -4,8 +4,8 @@ from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, ListView, UpdateView, DeleteView, DetailView
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib import messages
 from .forms import ServidorForm, AlunoForm
 from .models import Endereco, Servidor, Aluno
@@ -16,6 +16,7 @@ def home(request):
     return render(request, 'home.html')
 
 @login_required
+@permission_required('usuarios.view_endereco', raise_exception=True)
 def endereco_autocomplete(request):
     query = request.GET.get('q', '').strip()
 
@@ -41,11 +42,13 @@ def endereco_autocomplete(request):
 
     return JsonResponse({'results': results})
 
-class AlunoListView(LoginRequiredMixin, ListView):
+class AlunoListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
+    permission_required = 'usuarios.view_aluno'
     model = Aluno
     template_name = 'usuarios/aluno_list.html'
     context_object_name = 'alunos'
     paginate_by = 5  
+    handle_no_permission = True
 
     def get_paginate_by(self, queryset):
         page_size = self.request.GET.get('page_size')
@@ -77,31 +80,39 @@ class AlunoListView(LoginRequiredMixin, ListView):
         return context
 
 
-class AlunoCreateView(LoginRequiredMixin, CreateView):
+class AlunoCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
+    permission_required = 'usuarios.add_aluno'
     model = Aluno
     form_class = AlunoForm
     template_name = 'usuarios/aluno_form.html'
     success_url = reverse_lazy('aluno_list')
+    handle_no_permission = True
 
 
-class AlunoUpdateView(LoginRequiredMixin, UpdateView):
+class AlunoUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
+    permission_required = 'usuarios.change_aluno'
     model = Aluno
     form_class = AlunoForm
     template_name = 'usuarios/aluno_form.html'
     success_url = reverse_lazy('aluno_list')
+    handle_no_permission = True
 
 
-class AlunoDetailView(LoginRequiredMixin, DetailView):
+class AlunoDetailView(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
+    permission_required = 'usuarios.view_aluno'
     model = Aluno
     template_name = 'usuarios/aluno_detail.html'
     context_object_name = 'aluno'
+    handle_no_permission = True
 
 
-class ServidorListView(LoginRequiredMixin, ListView):
+class ServidorListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
+    permission_required = 'usuarios.view_servidor'
     model = Servidor
     template_name = 'usuarios/servidor_list.html'
     context_object_name = 'servidores'
     paginate_by = 10
+    handle_no_permission = True
 
     def get_paginate_by(self, queryset):
         page_size = self.request.GET.get('page_size')
@@ -136,26 +147,32 @@ class ServidorListView(LoginRequiredMixin, ListView):
         return context
 
 
-class ServidorCreateView(LoginRequiredMixin, CreateView):
+class ServidorCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
+    permission_required = 'usuarios.add_servidor'
     model = Servidor
     form_class = ServidorForm
     template_name = 'usuarios/servidor_form.html'
     success_url = reverse_lazy('servidor_list')
+    handle_no_permission = True
 
 
-class ServidorUpdateView(LoginRequiredMixin, UpdateView):
+class ServidorUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
+    permission_required = 'usuarios.change_servidor'
     model = Servidor
     form_class = ServidorForm
     template_name = 'usuarios/servidor_form.html'
     success_url = reverse_lazy('servidor_list')
+    handle_no_permission = True
 
 
-class ServidorDeleteView(LoginRequiredMixin, DeleteView):
+class ServidorDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
+    permission_required = 'usuarios.delete_servidor'
     model = Servidor
     template_name = 'usuarios/servidor_confirm_delete.html'
     success_url = reverse_lazy('servidor_list')
+    handle_no_permission = True
     
-    
+
 def login_view(request):
     if request.user.is_authenticated:
         return redirect('home')
@@ -186,3 +203,8 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     return redirect('login')
+
+
+def handle_no_permission(self):
+    messages.error(self.request, "Você não tem permissão para acessar esta área.")
+    return redirect('home')
