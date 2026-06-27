@@ -148,7 +148,8 @@ def logout_view(request):
     return redirect('login')
 
 
-class UsuarioExternoListView(ListView):
+class UsuarioExternoListView(LoginRequiredMixin, CustomPermissionMixin, ListView):
+    permission_required = 'usuarios.view_usuarioexterno'
     model = UsuarioExterno
     template_name = 'usuarios/usuario_externo/usuario_externo_list.html'
     context_object_name = 'usuarios_externos'
@@ -179,24 +180,28 @@ class UsuarioExternoListView(ListView):
         context['page_size_options'] = [5, 10, 25, 50]
         return context
 
-class UsuarioExternoDetailView(DetailView):
+class UsuarioExternoDetailView(LoginRequiredMixin, CustomPermissionMixin, DetailView):
+    permission_required = 'usuarios.view_usuarioexterno'
     model = UsuarioExterno
     template_name = 'usuarios/usuario_externo/usuario_externo_detail.html'
     context_object_name = 'usuario_externo'
 
-class UsuarioExternoCreateView(CreateView):
+class UsuarioExternoCreateView(LoginRequiredMixin, CustomPermissionMixin, CreateView):
+    permission_required = 'usuarios.add_usuarioexterno'
     model = UsuarioExterno
     form_class = UsuarioExternoForm
     template_name = 'usuarios/usuario_externo/usuario_externo_form.html'
     success_url = reverse_lazy('usuario_externo_list')
     
-class UsuarioExternoUpdateView(UpdateView):
+class UsuarioExternoUpdateView(LoginRequiredMixin, CustomPermissionMixin, UpdateView):
+    permission_required = 'usuarios.change_usuarioexterno'
     model = UsuarioExterno
     form_class = UsuarioExternoForm
     template_name = 'usuarios/usuario_externo/usuario_externo_form.html'
     success_url = reverse_lazy('usuario_externo_list')
 
-class UsuarioExternoDeleteView(DeleteView):
+class UsuarioExternoDeleteView(LoginRequiredMixin, CustomPermissionMixin, DeleteView):
+    permission_required = 'usuarios.delete_usuarioexterno'
     model = UsuarioExterno
     template_name = 'usuarios/usuario_externo_confirm_delete.html'
     success_url = reverse_lazy('usuario_externo_list')
