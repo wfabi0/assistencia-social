@@ -1,0 +1,47 @@
+.custom-input-group {
+  border: 1px solid #292929;
+  background-color: #ffffff;
+  transition:
+    border-color 0.15s ease-in-out,
+    box-shadow 0.15s ease-in-out;
+}
+.input-inset {
+  border: none !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+}
+.custom-input-group:focus-within {
+  border-color: #25a25a !important;
+  box-shadow: 0 0 0 0.25rem rgba(37, 162, 90, 0.25) !important;
+}
+
+.btn-primary-custom {
+  background-color: #25a25a;
+  color: white;
+  transition: all 0.2s ease;
+}
+.btn-primary-custom:hover {
+  background-color: #75ad0a;
+  color: white;
+}
+.text-on-surface-variant {
+  color: #3e4a3f;
+}
+.form-check-input:checked {
+  background-color: #25a25a;
+  border-color: #25a25a;
+}
+.form-check-input:focus {
+  box-shadow: 0 0 0 0.25rem rgba(37, 162, 90, 0.25);
+  border-color: #25a25a;
+}
+.tracking-tight {
+  letter-spacing: -0.02em;
+}
+.tracking-wider {
+  letter-spacing: 0.05em;
+}
+.tracking-widest {
+  letter-spacing: 0.1em;
+}

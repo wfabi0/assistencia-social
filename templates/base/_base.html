@@ -54,6 +54,12 @@
                                     Servidores
                                 </a>
                             </li>
+
+                            <li>
+                                <a class="dropdown-item" href="{% url 'usuario_externo_list' %}">
+                                    Usuários Externos
+                                </a>
+                            </li>
                         </ul>
                     </li>
 
@@ -85,33 +91,47 @@
                 </ul>
 
                 <!-- Usuário -->
-                <ul class="navbar-nav">
+                {% if user.is_authenticated %}
+                    <ul class="navbar-nav">
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle"
+                                href="#"
+                                role="button"
+                                data-bs-toggle="dropdown">
 
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle"
-                            href="#"
-                            role="button"
-                            data-bs-toggle="dropdown">
-
-                            {% if user.is_authenticated %}
                                 {{ user.username }}
-                            {% else %}
-                                Usuário
-                            {% endif %}
+                            </a>
 
-                        </a>
-
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li>
-                                <a class="dropdown-item" href="#">
-                                    Sair
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li>
+                                    <form method="post" action="{% url 'logout' %}" class="m-0">
+                                        {% csrf_token %}
+                                        <button type="submit" class="dropdown-item">
+                                            Sair
+                                        </button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                {% else %}
+                    <ul class="navbar-nav">
+                        {% if user.is_authenticated %}
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                    {{ user.username }}
                                 </a>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><a class="dropdown-item" href="{% url 'logout' %}">Sair</a></li>
+                                </ul>
                             </li>
-                        </ul>
-
-                    </li>
-
-                </ul>
+                        {% else %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'login' %}">Login</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                {% endif %}
 
             </div>
 
