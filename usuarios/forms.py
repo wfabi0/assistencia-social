@@ -99,6 +99,12 @@ class ServidorForm(forms.ModelForm):
                 self.initial['cargo_outro'] = self.instance.cargo
             else:
                 self.initial['cargo'] = self.instance.cargo
+        
+        if self.is_bound:
+            for field_name in self.errors:
+                if field_name in self.fields:
+                    attrs = self.fields[field_name].widget.attrs
+                    attrs['class'] = attrs.get('class', '') + ' is-invalid'
 
     def _parse_endereco_texto(self, endereco_texto):
         match = ENDERECO_PATTERN.match(endereco_texto)
@@ -326,6 +332,12 @@ class AlunoForm(forms.ModelForm):
         if endereco:
             self.fields['endereco_busca'].initial = str(endereco)
             self.fields['endereco_id'].initial = endereco.pk
+        
+        if self.is_bound:
+            for field_name in self.errors:
+                if field_name in self.fields:
+                    attrs = self.fields[field_name].widget.attrs
+                    attrs['class'] = attrs.get('class', '') + ' is-invalid'
 
     def _parse_endereco_texto(self, endereco_texto):
         
@@ -502,6 +514,12 @@ class UsuarioExternoForm(forms.ModelForm):
         if endereco:
             self.fields['endereco_busca'].initial = str(endereco)
             self.fields['endereco_id'].initial = endereco.pk
+        
+        if self.is_bound:
+            for field_name in self.errors:
+                if field_name in self.fields:
+                    attrs = self.fields[field_name].widget.attrs
+                    attrs['class'] = attrs.get('class', '') + ' is-invalid'
     
     def clean_nome(self):
         nome = self.cleaned_data['nome'].strip()

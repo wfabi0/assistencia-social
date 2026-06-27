@@ -281,6 +281,13 @@ body {
     box-shadow: 0 0 0 0.2rem rgba(29, 78, 216, 0.14);
 }
 
+.form-page .form-control.is-invalid,
+.form-page .form-select.is-invalid,
+.form-page textarea.is-invalid,
+.form-page input.is-invalid {
+    border-color: #dc3545 !important;
+}
+
 .form-page .form-label {
     color: var(--text-strong);
     margin-bottom: 0.45rem;
