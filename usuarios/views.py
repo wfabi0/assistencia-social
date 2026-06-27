@@ -9,6 +9,9 @@ from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMix
 from django.contrib import messages
 from .forms import ServidorForm, AlunoForm
 from .models import Endereco, Servidor, Aluno
+from .forms import ServidorForm, AlunoForm, UsuarioExternoForm
+from .models import Endereco, Servidor, Aluno, UsuarioExterno
+
 
 class CustomPermissionMixin(PermissionRequiredMixin):
     """
@@ -143,3 +146,57 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     return redirect('login')
+
+
+class UsuarioExternoListView(ListView):
+    model = UsuarioExterno
+    template_name = 'usuarios/usuario_externo/usuario_externo_list.html'
+    context_object_name = 'usuarios_externos'
+    paginate_by = 5  # padrão 5
+    
+    def get_paginate_by(self, queryset):
+        page_size = self.request.GET.get('page_size')
+        try:
+            page_size = int(page_size)
+        except (TypeError, ValueError):
+            return self.paginate_by
+        return page_size if page_size > 0 else self.paginate_by
+    
+    def get_queryset(self):
+        queryset = UsuarioExterno.objects.select_related('endereco').order_by('nome')
+        serach = self.request.GET.get('q', '').strip()
+        if serach:
+            queryset = queryset.filter(
+                Q(nome__icontains=serach)
+                | Q(cpf__icontains=serach)
+            )
+        return queryset
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['q'] = self.request.GET.get('q', '').strip()
+        context['page_size'] = self.get_paginate_by(self.get_queryset())
+        context['page_size_options'] = [5, 10, 25, 50]
+        return context
+
+class UsuarioExternoDetailView(DetailView):
+    model = UsuarioExterno
+    template_name = 'usuarios/usuario_externo/usuario_externo_detail.html'
+    context_object_name = 'usuario_externo'
+
+class UsuarioExternoCreateView(CreateView):
+    model = UsuarioExterno
+    form_class = UsuarioExternoForm
+    template_name = 'usuarios/usuario_externo/usuario_externo_form.html'
+    success_url = reverse_lazy('usuario_externo_list')
+    
+class UsuarioExternoUpdateView(UpdateView):
+    model = UsuarioExterno
+    form_class = UsuarioExternoForm
+    template_name = 'usuarios/usuario_externo/usuario_externo_form.html'
+    success_url = reverse_lazy('usuario_externo_list')
+
+class UsuarioExternoDeleteView(DeleteView):
+    model = UsuarioExterno
+    template_name = 'usuarios/usuario_externo_confirm_delete.html'
+    success_url = reverse_lazy('usuario_externo_list')

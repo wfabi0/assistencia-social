@@ -1,0 +1,103 @@
+{% extends 'base/_layout_list.html' %}
+
+{% block title %}Lista de Usuários Externos{% endblock %}
+
+{% block titulo_lista %}Usuários Externos{% endblock %}
+
+{% block formulario_busca %}
+<form method="get" class="mb-3">
+    <div class="row g-2 align-items-end">
+        <div class="col-12 col-md-5">
+            <input type="search" name="q" value="{{ q }}"
+                class="form-control" placeholder="Buscar por nome ou cpf...">
+        </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-primary">Buscar</button>
+            <a href="{% url 'usuario_externo_list' %}" class="btn btn-outline-secondary ms-1">Limpar</a>
+        </div>
+        <div class="col-auto">
+            <select name="page_size" class="form-select" onchange="this.form.submit()">
+                {% for option in page_size_options %}
+                <option value="{{ option }}" {% if page_size == option %}selected{% endif %}>
+                    {{ option }} / página
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-12 col-md-auto ms-md-auto mt-2 mt-md-0">
+            <a href="{% url 'usuario_externo_create' %}" class="btn btn-success w-100 w-md-auto">
+                + Novo Usuário Externo
+            </a>
+        </div>
+    </div>
+</form>
+{% endblock %}
+
+{% block cabecalho_tabela %}
+    <th>Nome</th>
+    <th>CPF</th>
+    <th>Email</th>
+    <th>Telefone</th>
+{% endblock %}
+
+{% block linhas_tabela %}
+    {% for usuario in usuarios_externos %}
+    <tr>
+        <td>{{ usuario.nome }}</td>
+        <td>{{ usuario.cpf }}</td>
+        <td>{{ usuario.email|default:"—" }}</td>
+        <td>{{ usuario.telefone|default:"—" }}</td>
+        <td class="text-nowrap p-2">
+            <a href="{% url 'usuario_externo_detail' usuario.pk %}" class="btn btn-info btn-sm">Detalhe</a>
+            <a href="{% url 'usuario_externo_update' usuario.pk %}" class="btn btn-warning btn-sm">Editar</a>
+            <button class="btn btn-danger btn-sm"
+                    data-modal="modalExcluirUsuarioExterno"
+                    data-url="{% url 'usuario_externo_delete' usuario.pk %}"
+                    data-mensagem="Tem certeza que deseja excluir <strong>{{ usuario.nome }}</strong>?">
+                Excluir
+            </button>
+        </td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="5" class="text-center">Nenhum usuário externo encontrado.</td></tr>
+    {% endfor %}
+{% endblock %}
+
+{% block cards_mobile %}
+    {% for usuario in usuarios_externos %}
+    <div class="card mb-3">
+        <div class="card-body">
+            <h6 class="card-title mb-0">{{ usuario.nome }}</h6>
+            <small class="text-muted">{{ usuario.cpf }}</small>
+            <hr class="my-2">
+            <div class="row g-1 small text-muted">
+                <div class="col-6">{{ usuario.email|default:"—" }}</div>
+                <div class="col-6">{{ usuario.telefone|default:"—" }}</div>
+            </div>
+            <div class="d-flex gap-2 mt-3">
+                <div class="d-flex gap-2 mt-3">
+                    <a href="{% url 'usuario_externo_detail' usuario.pk %}"
+                        class="btn btn-info btn-sm flex-fill">Detalhe</a>
+                    <a href="{% url 'usuario_externo_update' usuario.pk %}"
+                        class="btn btn-warning btn-sm flex-fill">Editar</a>
+                    <button class="btn btn-danger btn-sm flex-fill"
+                            data-modal="modalExcluirUsuarioExterno"
+                            data-url="{% url 'usuario_externo_delete' usuario.pk %}"
+                            data-mensagem="Tem certeza que deseja excluir <strong>{{ usuario.nome }}</strong>?">
+                        Excluir
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <p class="text-center text-muted">Nenhum usuário externo encontrado.</p>
+    {% endfor %}
+{% endblock %}
+
+{% block params_paginacao_first %}{% if q %}&q={{ q }}{% endif %}{% if page_size %}&page_size={{ page_size }}{% endif %}{% endblock %}
+{% block params_paginacao_last %}{% if q %}&q={{ q }}{% endif %}{% if page_size %}&page_size={{ page_size }}{% endif %}{% endblock %}
+
+{% block modais %}
+    {% include "components/modal.html" with modal_id="modalExcluirUsuarioExterno" titulo="Confirmar Exclusão de Usuário Externo" btn_confirmar="Sim, Excluir" btn_cancelar="Cancelar" %}
+{% endblock %}

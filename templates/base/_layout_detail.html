@@ -1,0 +1,26 @@
+{% extends 'base/_base.html' %}
+
+{% block content %}
+<div class="container mt-4 pb-5">
+
+    <h2 class="mb-3">{% block titulo_detail %}{% endblock %}</h2>
+
+    <div class="card">
+        <div class="card-header text-muted">
+            {% block subtitulo_detail %}Ficha{% endblock %}
+        </div>
+        <div class="card-body">
+            <div class="row">
+                {% block campos_detail %}{% endblock %}
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex gap-2 mt-3">
+        {% block acoes_detail %}{% endblock %}
+    </div>
+
+    {% block extra_detail %}{% endblock %}
+
+</div>
+{% endblock %}
