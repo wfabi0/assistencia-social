@@ -12,6 +12,8 @@ from .models import Endereco, Servidor, Aluno
 from .forms import ServidorForm, AlunoForm, UsuarioExternoForm
 from .models import Endereco, Servidor, Aluno, UsuarioExterno
 from django.views.generic.list import MultipleObjectMixin
+from atendimentos.models import Atendimento  
+from usuarios.models import Aluno, Servidor  
 
 
 class CustomPermissionMixin(PermissionRequiredMixin):
@@ -83,33 +85,35 @@ class AlunoUpdateView(LoginRequiredMixin, CustomPermissionMixin, UpdateView):
     template_name = 'usuarios/aluno_form.html'
     success_url = reverse_lazy('aluno_list')
 
-class HistoricoAlunoView(LoginRequiredMixin, CustomPermissionMixin, MultipleObjectMixin, DetailView):
+class HistoricoAlunoView(LoginRequiredMixin, CustomPermissionMixin, ListView):
     permission_required = 'usuarios.view_aluno'
-    model = Aluno
+    model = Atendimento
     template_name = 'atendimentos/historico.html'
-    context_object_name = 'pessoa'
+    context_object_name = 'atendimentos'
     paginate_by = 5
 
+    def get_queryset(self):
+        return Atendimento.objects.filter(aluno__id=self.kwargs['pk']).order_by('-data_atendimento')
+
     def get_context_data(self, **kwargs):
-        object_list = self.object.atendimentos.all()
-        context = super().get_context_data(object_list=object_list, **kwargs)
-        
-        context['atendimentos'] = context['object_list']
+        context = super().get_context_data(**kwargs)
+        context['pessoa'] = Aluno.objects.get(pk=self.kwargs['pk'])
         context['tipo_pessoa'] = 'Aluno'
         return context
 
-
-class HistoricoServidorView(LoginRequiredMixin, CustomPermissionMixin, MultipleObjectMixin, DetailView):
+class HistoricoServidorView(LoginRequiredMixin, CustomPermissionMixin, ListView):
     permission_required = 'usuarios.view_servidor'
-    model = Servidor
+    model = Atendimento
     template_name = 'atendimentos/historico.html'
-    context_object_name = 'pessoa'
+    context_object_name = 'atendimentos'
     paginate_by = 5
 
+    def get_queryset(self):
+        return Atendimento.objects.filter(servidor__id=self.kwargs['pk']).order_by('-data_atendimento')
+
     def get_context_data(self, **kwargs):
-        object_list = self.object.atendimentos.all()
-        context = super().get_context_data(object_list=object_list, **kwargs)
-        context['atendimentos'] = context['object_list']
+        context = super().get_context_data(**kwargs)
+        context['pessoa'] = Servidor.objects.get(pk=self.kwargs['pk'])
         context['tipo_pessoa'] = 'Servidor'
         return context
 
@@ -176,7 +180,7 @@ class UsuarioExternoListView(LoginRequiredMixin, CustomPermissionMixin, ListView
     model = UsuarioExterno
     template_name = 'usuarios/usuario_externo/usuario_externo_list.html'
     context_object_name = 'usuarios_externos'
-    paginate_by = 5  # padrão 5
+    paginate_by = 5  
     
     def get_paginate_by(self, queryset):
         page_size = self.request.GET.get('page_size')
