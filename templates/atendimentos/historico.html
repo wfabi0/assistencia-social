@@ -1,0 +1,143 @@
+{% extends 'base/_base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'home' %}">Principal</a></li>
+            {% if tipo_pessoa == 'Aluno' %}
+                <li class="breadcrumb-item"><a href="{% url 'aluno_list' %}">Lista de Alunos</a></li>
+            {% else %}
+                <li class="breadcrumb-item"><a href="{% url 'servidor_list' %}">Lista de Servidores</a></li>
+            {% endif %}
+            <li class="breadcrumb-item active" aria-current="page">Registro de Atendimento</li>
+        </ol>
+    </nav>
+
+   <div class="card mb-4">
+        <div class="card-header bg-light">
+            <h5 class="mb-0">Ficha Completa - {{ pessoa.nome }}</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Nome:</strong> {{ pessoa.nome }}</p>
+                    
+                    {% if tipo_pessoa == 'Aluno' %}
+                        <p><strong>RA:</strong> {{ pessoa.ra|default:"Não informado" }}</p>
+                        <p><strong>Curso:</strong> {{ pessoa.curso|default:"Não informado" }}</p>
+                        <p><strong>Responsáveis:</strong> 
+                            {% for resp in pessoa.responsaveis.all %}
+                                {{ resp.nome }} ({{ resp.parentesco }}){% if not forloop.last %}, {% endif %}
+                            {% empty %}
+                                Não informado
+                            {% endfor %}
+                        </p>
+                    {% else %}
+                        <p><strong>SIAPE:</strong> {{ pessoa.siape|default:"Não informado" }}</p>
+                        <p><strong>Cargo/Setor:</strong> {{ pessoa.cargo|default:"Não informado" }}</p>
+                    {% endif %}
+                    
+                    <p><strong>Endereço:</strong> {{ pessoa.endereco|default:"Não informado" }}</p>
+                </div>
+                
+                <div class="col-md-6">
+                    <p><strong>Telefone:</strong> {{ pessoa.telefone|default:"Não informado" }}</p>
+                    <p><strong>E-mail:</strong> {{ pessoa.email|default:"Não informado" }}</p>
+                    <p><strong>Assistente Social Responsável:</strong> - </p>
+                    <p><strong>CRESS:</strong> - </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header bg-light d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Histórico de Atendimentos</h5>
+        </div>
+        <div class="card-body">
+            <table class="table table-striped table-bordered">
+                <thead class="table-light">
+                    <tr>
+                        <th>Data</th>
+                        <th>Descrição</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for atendimento in atendimentos %}
+                    <tr>
+                        <td>{{ atendimento.data_atendimento|date:"d/m/Y" }}</td>
+                        <td>{{ atendimento.descricao }}</td>
+                        <td>
+                            <span class="badge bg-secondary">{{ atendimento.status }}</span>
+                        </td>
+                        <td>
+                            <a href="{% url 'editar_atendimento' atendimento.id %}" class="btn btn-warning btn-sm">Editar</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center py-3 text-muted">
+                            Nenhum atendimento registrado
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+     
+
+            {% if page_obj.has_other_pages %}
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                    <div class="text-muted">
+                        <small>Mostrando {{ page_obj.start_index }} até {{ page_obj.end_index }} de {{ page_obj.paginator.count }} registros</small>
+                    </div>
+
+                    <nav aria-label="Navegação de páginas dos atendimentos">
+                        <ul class="pagination mb-0">
+                            
+                            {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+                            </li>
+                            {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link">Anterior</span>
+                            </li>
+                            {% endif %}
+
+                            {% for num in page_obj.paginator.page_range %}
+                                {% if page_obj.number == num %}
+                                <li class="page-item active" aria-current="page">
+                                    <span class="page-link">{{ num }}</span>
+                                </li>
+                                {% else %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                                </li>
+                                {% endif %}
+                            {% endfor %}
+
+                            {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}">Próximo</a>
+                            </li>
+                            {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link">Próximo</span>
+                            </li>
+                            {% endif %}
+                            
+                        </ul>
+                    </nav>
+                </div>
+            {% endif %}
+            </div> 
+
+        </div>
+    </div>
+
+</div>
+{% endblock %}

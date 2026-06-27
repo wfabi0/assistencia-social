@@ -61,6 +61,9 @@
                 <td>{{ servidor.telefone|default:'-' }}</td>
 
                 <td>
+                    <a href="{% url 'servidor_detail' servidor.id %}" class="btn btn-info btn-sm">
+                        Histórico
+
                     <a href="{% url 'servidor_update' servidor.id %}" class="btn btn-warning btn-sm">
                         Editar
                     </a>
