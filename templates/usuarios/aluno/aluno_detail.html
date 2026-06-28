@@ -6,32 +6,48 @@
 {% block campos_detail %}
     <div class="col-md-6 mb-3">
         <p class="fw-bold mb-1">Nome:</p>
-        <p class="text-primary mb-0">{{ aluno.nome }}</p>
+        <p class="mb-0">{{ aluno.nome }}</p>
     </div>
 
     <div class="col-md-6 mb-3">
         <p class="fw-bold mb-1">RA:</p>
-        <p class="text-primary mb-0">{{ aluno.ra }}</p>
+        <p class="mb-0">{{ aluno.ra }}</p>
     </div>
 
     <div class="col-md-6 mb-3">
         <p class="fw-bold mb-1">Curso:</p>
-        <p class="text-primary mb-0">{{ aluno.curso }}</p>
+        <p class="mb-0">{{ aluno.curso }}</p>
     </div>
 
     <div class="col-md-6 mb-3">
         <p class="fw-bold mb-1">Email:</p>
-        <p class="text-primary mb-0">{{ aluno.email|default:"—" }}</p>
+        <p class="mb-0">{{ aluno.email|default:"—" }}</p>
     </div>
 
     <div class="col-md-6 mb-3">
         <p class="fw-bold mb-1">Telefone:</p>
-        <p class="text-primary mb-0">{{ aluno.telefone|default:"—" }}</p>
+        <p class="mb-0">{{ aluno.telefone|default:"—" }}</p>
     </div>
 
     <div class="col-md-6 mb-3">
         <p class="fw-bold mb-1">Data de Nascimento:</p>
-        <p class="text-primary mb-0">{{ aluno.data_nascimento|date:"d \d\e F \d\e Y" }}</p>
+        <p class="mb-0">{{ aluno.data_nascimento|date:"d \d\e F \d\e Y" }}</p>
+    </div>
+    
+    <div class="col-md-6 mb-3">
+        <p class="fw-bold mb-1">Endereço:</p>
+        <p class="mb-0">{{ aluno.endereco }}</p>
+    </div>
+    
+    <div class="col-md-6 mb-3">
+        <p class="fw-bold mb-1">Responsáveis:</p>
+        <p class="mb-0">
+            {% for resp in aluno.responsaveis.all %}
+                {{ resp.nome }} ({{ resp.parentesco }}){% if not forloop.last %}, {% endif %}
+            {% empty %}
+                Não informado
+            {% endfor %}
+        </p>
     </div>
 {% endblock %}
 

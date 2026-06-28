@@ -76,6 +76,9 @@ class AlunoDetailView(LoginRequiredMixin, CustomPermissionMixin, DetailView):
     model = Aluno
     template_name = 'usuarios/aluno/aluno_detail.html'
     context_object_name = 'aluno'
+    
+    def get_queryset(self):
+        return Aluno.objects.prefetch_related('responsaveis')
 
 class AlunoCreateView(LoginRequiredMixin, CustomPermissionMixin, CreateView):
     permission_required = 'usuarios.add_aluno'
