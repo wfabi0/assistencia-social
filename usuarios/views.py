@@ -162,6 +162,13 @@ class ServidorListView(LoginRequiredMixin, CustomPermissionMixin, ListView):
         search = self.request.GET.get('q', '').strip()
         if search: queryset = queryset.filter(Q(nome__icontains=search) | Q(siape__icontains=search) | Q(cargo__icontains=search) | Q(email__icontains=search) | Q(telefone__icontains=search))
         return queryset
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['q'] = self.request.GET.get('q', '').strip()
+        context['page_size'] = self.get_paginate_by(self.get_queryset())
+        context['page_size_options'] = [5, 10, 25, 50]
+        return context
 
 class ServidorCreateView(LoginRequiredMixin, CustomPermissionMixin, CreateView):
     permission_required = 'usuarios.add_servidor'

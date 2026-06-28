@@ -12,7 +12,7 @@
         </div>
         <div class="col-auto">
             <button type="submit" class="btn btn-primary">Buscar</button>
-            <a href="{% url 'servidor_list' %}" class="btn btn-outline-secondary ms-1">Limpar</a>
+            <a href="{% url 'servidor_list' %}?page_size={{ page_size }}" class="btn btn-outline-secondary ms-1">Limpar</a>
         </div>
         <div class="col-auto">
             <select name="page_size" class="form-select" onchange="this.form.submit()">
