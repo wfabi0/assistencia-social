@@ -1,64 +1,52 @@
+{% extends 'base/_layout_detail.html' %}
 
-{% extends 'base/_base.html' %}
+{% block titulo_detail %}Dados do Aluno{% endblock %}
+{% block subtitulo_detail %}Ficha do Aluno{% endblock %}
 
-{% block content %}
-<div class="container mt-4">
-
-    <h2>Dados do Aluno</h2>
-
-    <div class="card mt-3">
-
-        <div class="card-header">
-            Ficha do Aluno
-        </div>
-
-        <div class="card-body">
-
-            <div class="row">
-
-                <div class="col-md-6 mb-3">
-                    <strong>Nome:</strong><br>
-                    {{ aluno.nome }}
-                </div>
-
-                <div class="col-md-6 mb-3">
-                    <strong>RA:</strong><br>
-                    {{ aluno.ra }}
-                </div>
-
-                <div class="col-md-6 mb-3">
-                    <strong>Curso:</strong><br>
-                    {{ aluno.curso }}
-                </div>
-
-                <div class="col-md-6 mb-3">
-                    <strong>Email:</strong><br>
-                    {{ aluno.email }}
-                </div>
-
-                <div class="col-md-6 mb-3">
-                    <strong>Telefone:</strong><br>
-                    {{ aluno.telefone }}
-                </div>
-
-                <div class="col-md-6 mb-3">
-                    <strong>Data de Nascimento:</strong><br>
-                    {{ aluno.data_nascimento }}
-                </div>
-
-            </div>
-
-            <a href="{% url 'aluno_list' %}" class="btn btn-secondary">
-                Voltar
-            </a>
-
-            <a href="{% url 'aluno_update' aluno.id %}" class="btn btn-warning">
-                Editar
-            </a>
-
-        </div>
-
+{% block campos_detail %}
+    <div class="col-md-6 mb-3">
+        <p class="fw-bold mb-1">Nome:</p>
+        <p class="text-primary mb-0">{{ aluno.nome }}</p>
     </div>
 
-</div>
+    <div class="col-md-6 mb-3">
+        <p class="fw-bold mb-1">RA:</p>
+        <p class="text-primary mb-0">{{ aluno.ra }}</p>
+    </div>
+
+    <div class="col-md-6 mb-3">
+        <p class="fw-bold mb-1">Curso:</p>
+        <p class="text-primary mb-0">{{ aluno.curso }}</p>
+    </div>
+
+    <div class="col-md-6 mb-3">
+        <p class="fw-bold mb-1">Email:</p>
+        <p class="text-primary mb-0">{{ aluno.email|default:"—" }}</p>
+    </div>
+
+    <div class="col-md-6 mb-3">
+        <p class="fw-bold mb-1">Telefone:</p>
+        <p class="text-primary mb-0">{{ aluno.telefone|default:"—" }}</p>
+    </div>
+
+    <div class="col-md-6 mb-3">
+        <p class="fw-bold mb-1">Data de Nascimento:</p>
+        <p class="text-primary mb-0">{{ aluno.data_nascimento|date:"d \d\e F \d\e Y" }}</p>
+    </div>
+{% endblock %}
+
+{% block acoes_detail %}
+    <a href="javascript:history.back()" class="btn btn-secondary">Voltar</a>
+    <a href="{% url 'aluno_update' aluno.pk %}" class="btn btn-warning">Editar</a>
+    <button class="btn btn-danger"
+            data-modal="modalExcluirAluno"
+            data-url="{% url 'aluno_delete' aluno.pk %}"
+            data-mensagem="Tem certeza que deseja excluir <strong>{{ aluno.nome }}</strong>?">
+        Excluir
+    </button>
+    <a href="{% url 'aluno_historico' aluno.pk %}" class="btn btn-info">Histórico</a>
+{% endblock %}
+
+{% block extra_detail %}
+    {% include "components/modal.html" with modal_id="modalExcluirAluno" titulo="Confirmar Exclusão" btn_confirmar="Sim, Excluir" btn_cancelar="Cancelar" %}
 {% endblock %}

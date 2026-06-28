@@ -1,215 +1,118 @@
-{% extends 'base/_base.html' %}
+{% extends 'base/_layout_form.html' %}
 
-{% block content %}
-<div class="container mt-4">
-
-    <h2>
-        {% if form.instance.pk %}
-            Editar Dados do Servidor
-        {% else %}
-            Cadastrar Servidor
-        {% endif %}
-    </h2>
-
-    <div class="card mt-3">
-        <div class="card-header">
-            Dados Gerais
-        </div>
-
-        <div class="card-body">
-            <form method="post" novalidate>
-                {% csrf_token %}
-
-                {% if form.non_field_errors %}
-                    <div class="alert alert-danger">
-                        {{ form.non_field_errors }}
-                    </div>
-                {% endif %}
-
-                <div class="row">
-
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">SIAPE</label>
-                        {{ form.siape }}
-                        {{ form.siape.errors }}
-                    </div>
-
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Nome</label>
-                        {{ form.nome }}
-                        {{ form.nome.errors }}
-                    </div>
-
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Cargo</label>
-                        {{ form.cargo }}
-                        {{ form.cargo.errors }}
-                    </div>
-
-                    <div
-                        class="col-md-6 mb-3"
-                        id="cargo-outro-container"
-                        style="display:none;"
-                    >
-                        <label class="form-label">Outro Cargo</label>
-                        {{ form.cargo_outro }}
-                        {{ form.cargo_outro.errors }}
-                    </div>
-
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Email</label>
-                        {{ form.email }}
-                        {{ form.email.errors }}
-                    </div>
-
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Telefone</label>
-                        {{ form.telefone }}
-                        {{ form.telefone.errors }}
-                    </div>
-
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Endereço</label>
-
-                        <div class="position-relative autocomplete-wrapper">
-                            {{ form.endereco_busca }}
-                            {{ form.endereco_id }}
-
-                            <div
-                                id="endereco-sugestoes"
-                                class="list-group position-absolute w-100 autocomplete-results"
-                            ></div>
-                        </div>
-
-                        {{ form.endereco_busca.errors }}
-                    </div>
-
-                </div>
-
-                <div class="mt-3">
-                    <a href="{% url 'servidor_list' %}" class="btn btn-secondary">
-                        Voltar
-                    </a>
-
-                    <button type="submit" class="btn btn-success">
-                        Salvar
-                    </button>
-                </div>
-
-            </form>
-        </div>
-    </div>
-
-</div>
+{% block titulo_form %}
+    {% if form.instance.pk %}Editar Dados do Servidor{% else %}Cadastrar Servidor{% endif %}
 {% endblock %}
 
-{% block extra_js %}
+{% block campos_form %}
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label class="form-label">SIAPE</label>
+            {{ form.siape }}
+            {% if form.siape.errors %}<div class="text-danger small mt-1">{{ form.siape.errors }}</div>{% endif %}
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <label class="form-label">Nome</label>
+            {{ form.nome }}
+            {% if form.nome.errors %}<div class="text-danger small mt-1">{{ form.nome.errors }}</div>{% endif %}
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <label class="form-label">Cargo</label>
+            {{ form.cargo }}
+            {% if form.cargo.errors %}<div class="text-danger small mt-1">{{ form.cargo.errors }}</div>{% endif %}
+        </div>
+
+        <div class="col-md-6 mb-3" id="cargo-outro-container" style="display:none;">
+            <label class="form-label">Outro Cargo</label>
+            {{ form.cargo_outro }}
+            {% if form.cargo_outro.errors %}<div class="text-danger small mt-1">{{ form.cargo_outro.errors }}</div>{% endif %}
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <label class="form-label">Email</label>
+            {{ form.email }}
+            {% if form.email.errors %}<div class="text-danger small mt-1">{{ form.email.errors }}</div>{% endif %}
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <label class="form-label">Telefone</label>
+            {{ form.telefone }}
+            {% if form.telefone.errors %}<div class="text-danger small mt-1">{{ form.telefone.errors }}</div>{% endif %}
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <label class="form-label">Endereço</label>
+            <div class="position-relative autocomplete-wrapper">
+                {{ form.endereco_busca }}
+                {{ form.endereco_id }}
+                <div id="endereco-sugestoes" class="list-group position-absolute w-100 autocomplete-results"></div>
+            </div>
+            {% if form.endereco_busca.errors %}<div class="text-danger small mt-1">{{ form.endereco_busca.errors }}</div>{% endif %}
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts_form %}
 <script>
 (() => {
-
     const input = document.getElementById('id_endereco_busca');
     const hiddenId = document.getElementById('id_endereco_id');
     const resultsBox = document.getElementById('endereco-sugestoes');
     const endpoint = "{% url 'endereco_autocomplete' %}";
-
     let debounceId = null;
 
-    const clearResults = () => {
-        resultsBox.innerHTML = '';
-    };
+    const clearResults = () => { resultsBox.innerHTML = ''; };
 
     const showResults = (results) => {
         clearResults();
-
-        if (!results.length) {
-            return;
-        }
-
+        if (!results.length) return;
         results.forEach((result) => {
-
             const button = document.createElement('button');
-
             button.type = 'button';
             button.className = 'list-group-item list-group-item-action';
             button.textContent = result.label;
-
             button.addEventListener('click', () => {
                 input.value = result.label;
                 hiddenId.value = result.id;
                 clearResults();
             });
-
             resultsBox.appendChild(button);
         });
     };
 
     const fetchResults = async (query) => {
-
-        if (!query) {
-            clearResults();
-            return;
-        }
-
+        if (!query) { clearResults(); return; }
         try {
-
-            const response = await fetch(
-                `${endpoint}?q=${encodeURIComponent(query)}`
-            );
-
+            const response = await fetch(`${endpoint}?q=${encodeURIComponent(query)}`);
             const payload = await response.json();
-
             showResults(payload.results || []);
-
-        } catch (error) {
-            console.error(error);
-        }
+        } catch (error) { console.error(error); }
     };
 
     input.addEventListener('input', () => {
-
         hiddenId.value = '';
-
         window.clearTimeout(debounceId);
-
-        debounceId = window.setTimeout(() => {
-            fetchResults(input.value.trim());
-        }, 250);
+        debounceId = window.setTimeout(() => fetchResults(input.value.trim()), 250);
     });
 
-    input.addEventListener('blur', () => {
+    input.addEventListener('blur', () => { window.setTimeout(clearResults, 150); });
 
-        window.setTimeout(() => {
-            clearResults();
-        }, 150);
-    });
-
-    if (input.value) {
-        fetchResults(input.value.trim());
-    }
+    if (input.value) fetchResults(input.value.trim());
 
     const cargoSelect = document.getElementById('id_cargo');
-    const cargoOutroContainer = document.getElementById(
-        'cargo-outro-container'
-    );
+    const cargoOutroContainer = document.getElementById('cargo-outro-container');
 
     function atualizarCampoCargo() {
-
-        if (!cargoSelect) {
-            return;
-        }
-
-        if (cargoSelect.value === 'Outros') {
-            cargoOutroContainer.style.display = 'block';
-        } else {
-            cargoOutroContainer.style.display = 'none';
-        }
+        if (!cargoSelect) return;
+        cargoOutroContainer.style.display = cargoSelect.value === 'Outros' ? 'block' : 'none';
     }
 
     if (cargoSelect) {
         cargoSelect.addEventListener('change', atualizarCampoCargo);
         atualizarCampoCargo();
     }
-
 })();
 </script>
 {% endblock %}

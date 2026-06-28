@@ -71,6 +71,12 @@ class AlunoListView(LoginRequiredMixin, CustomPermissionMixin, ListView):
         context['page_size_options'] = [5, 10, 25, 50]
         return context
 
+class AlunoDetailView(LoginRequiredMixin, CustomPermissionMixin, DetailView):
+    permission_required = 'usuarios.view_aluno'
+    model = Aluno
+    template_name = 'usuarios/aluno/aluno_detail.html'
+    context_object_name = 'aluno'
+
 class AlunoCreateView(LoginRequiredMixin, CustomPermissionMixin, CreateView):
     permission_required = 'usuarios.add_aluno'
     model = Aluno
