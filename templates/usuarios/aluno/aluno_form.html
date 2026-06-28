@@ -29,7 +29,22 @@
 {% endblock %}
 
 {% block scripts_form %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://npmcdn.com/flatpickr/dist/l10n/pt.js"></script>
+
 <script>
+    document.querySelectorAll('.datepicker').forEach(function(el) {
+        flatpickr(el, {
+            dateFormat: 'Y-m-d',
+            altInput: true,
+            altFormat: 'd/m/Y',
+            locale: 'pt',
+            allowInput: true,
+            defaultDate: el.value || null,
+        });
+    });
+
 (() => {
     const input = document.getElementById('id_endereco_busca');
     const hiddenId = document.getElementById('id_endereco_id');

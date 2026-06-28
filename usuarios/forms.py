@@ -314,9 +314,10 @@ class AlunoForm(forms.ModelForm):
                 'onkeyup': "let v=this.value.replace(/\D/g,''); v=v.replace(/^(\d{2})(\d)/g,'($1) $2'); v=v.replace(/(\d)(\d{4})$/,'$1-$2'); this.value=v;"
             }),
             'data_nascimento': forms.DateInput(attrs={
-                'class': 'form-control',
-                'type': 'date'
-            }),
+                'class': 'form-control datepicker',
+                'placeholder': 'DD/MM/YYYY',
+                'autocomplete': 'off',
+            }, format='%Y-%m-%d'),
         }
 
     def __init__(self, *args, **kwargs):
@@ -327,7 +328,6 @@ class AlunoForm(forms.ModelForm):
         self.fields['email'].required = True
         self.fields['data_nascimento'].required = True
 
-  
         endereco = getattr(self.instance, 'endereco', None)
         if endereco:
             self.fields['endereco_busca'].initial = str(endereco)
