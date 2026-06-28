@@ -166,6 +166,15 @@
         if (tipo === 'ALU') document.getElementById('campo-aluno').style.display = 'block';
         if (tipo === 'SER') document.getElementById('campo-servidor').style.display = 'block';
         if (tipo === 'EXT') document.getElementById('campo-usuario-externo').style.display = 'block';
+
+        // Aplica is-invalid nos inputs de autocomplete se houver erro no campo hidden
+        const temErroNonField = parseInt(document.getElementById('tem-erro-non-field').dataset.temErro) > 0;
+        console.log('tipo:', tipo);
+        if (temErroNonField) {
+            if (tipo === 'ALU') document.getElementById('busca-aluno').classList.add('is-invalid');
+            if (tipo === 'SER') document.getElementById('busca-servidor').classList.add('is-invalid');
+            if (tipo === 'EXT') document.getElementById('busca-usuario-externo').classList.add('is-invalid');
+        }
     }
 
     document.querySelectorAll('[name="tipo_pessoa"]').forEach(radio => {

@@ -49,7 +49,7 @@ def endereco_autocomplete(request):
 class AlunoListView(LoginRequiredMixin, CustomPermissionMixin, ListView):
     permission_required = 'usuarios.view_aluno'
     model = Aluno
-    template_name = 'usuarios/aluno_list.html'
+    template_name = 'usuarios/aluno/aluno_list.html'
     context_object_name = 'alunos'
     paginate_by = 5
 
@@ -71,19 +71,46 @@ class AlunoListView(LoginRequiredMixin, CustomPermissionMixin, ListView):
         context['page_size_options'] = [5, 10, 25, 50]
         return context
 
+class AlunoDetailView(LoginRequiredMixin, CustomPermissionMixin, DetailView):
+    permission_required = 'usuarios.view_aluno'
+    model = Aluno
+    template_name = 'usuarios/aluno/aluno_detail.html'
+    context_object_name = 'aluno'
+    
+    def get_queryset(self):
+        return Aluno.objects.prefetch_related('responsaveis')
+
 class AlunoCreateView(LoginRequiredMixin, CustomPermissionMixin, CreateView):
     permission_required = 'usuarios.add_aluno'
     model = Aluno
     form_class = AlunoForm
-    template_name = 'usuarios/aluno_form.html'
+    template_name = 'usuarios/aluno/aluno_form.html'
     success_url = reverse_lazy('aluno_list')
+    
+    def form_valid(self, form):
+        messages.success(self.request, 'Aluno cadastrado com sucesso!')
+        return super().form_valid(form)
 
 class AlunoUpdateView(LoginRequiredMixin, CustomPermissionMixin, UpdateView):
     permission_required = 'usuarios.change_aluno'
     model = Aluno
     form_class = AlunoForm
-    template_name = 'usuarios/aluno_form.html'
+    template_name = 'usuarios/aluno/aluno_form.html'
     success_url = reverse_lazy('aluno_list')
+    
+    def form_valid(self, form):
+        messages.success(self.request, 'Aluno atualizado com sucesso!')
+        return super().form_valid(form)
+
+class AlunoDeleteView(LoginRequiredMixin, CustomPermissionMixin, DeleteView):
+    permission_required = 'usuarios.delete_aluno'
+    model = Aluno
+    template_name = 'usuarios/aluno/aluno_confirm_delete.html'
+    success_url = reverse_lazy('aluno_list')
+    
+    def form_valid(self, form):
+        messages.success(self.request, 'Aluno removido com sucesso!')
+        return super().form_valid(form)
 
 class HistoricoAlunoView(LoginRequiredMixin, CustomPermissionMixin, ListView):
     permission_required = 'usuarios.view_aluno'
@@ -121,7 +148,7 @@ class HistoricoServidorView(LoginRequiredMixin, CustomPermissionMixin, ListView)
 class ServidorListView(LoginRequiredMixin, CustomPermissionMixin, ListView):
     permission_required = 'usuarios.view_servidor'
     model = Servidor
-    template_name = 'usuarios/servidor_list.html'
+    template_name = 'usuarios/servidor/servidor_list.html'
     context_object_name = 'servidores'
     paginate_by = 10
 
@@ -135,26 +162,45 @@ class ServidorListView(LoginRequiredMixin, CustomPermissionMixin, ListView):
         search = self.request.GET.get('q', '').strip()
         if search: queryset = queryset.filter(Q(nome__icontains=search) | Q(siape__icontains=search) | Q(cargo__icontains=search) | Q(email__icontains=search) | Q(telefone__icontains=search))
         return queryset
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['q'] = self.request.GET.get('q', '').strip()
+        context['page_size'] = self.get_paginate_by(self.get_queryset())
+        context['page_size_options'] = [5, 10, 25, 50]
+        return context
 
 class ServidorCreateView(LoginRequiredMixin, CustomPermissionMixin, CreateView):
     permission_required = 'usuarios.add_servidor'
     model = Servidor
     form_class = ServidorForm
-    template_name = 'usuarios/servidor_form.html'
+    template_name = 'usuarios/servidor/servidor_form.html'
     success_url = reverse_lazy('servidor_list')
+    
+    def form_valid(self, form):
+        messages.success(self.request, "Servidor cadastrado com sucesso!")
+        return super().form_valid(form)
 
 class ServidorUpdateView(LoginRequiredMixin, CustomPermissionMixin, UpdateView):
     permission_required = 'usuarios.change_servidor'
     model = Servidor
     form_class = ServidorForm
-    template_name = 'usuarios/servidor_form.html'
+    template_name = 'usuarios/servidor/servidor_form.html'
     success_url = reverse_lazy('servidor_list')
+    
+    def form_valid(self, form):
+        messages.success(self.request, 'Servidor atualizado com sucesso!')
+        return super().form_valid(form)
 
 class ServidorDeleteView(LoginRequiredMixin, CustomPermissionMixin, DeleteView):
     permission_required = 'usuarios.delete_servidor'
     model = Servidor
-    template_name = 'usuarios/servidor_confirm_delete.html'
+    template_name = 'usuarios/servidor/servidor_confirm_delete.html'
     success_url = reverse_lazy('servidor_list')
+    
+    def form_valid(self, form):
+        messages.success(self.request, 'Servidor removido com sucesso!')
+        return super().form_valid(form)
 
 def login_view(request):
     if request.user.is_authenticated: return redirect('home')
@@ -220,15 +266,27 @@ class UsuarioExternoCreateView(LoginRequiredMixin, CustomPermissionMixin, Create
     template_name = 'usuarios/usuario_externo/usuario_externo_form.html'
     success_url = reverse_lazy('usuario_externo_list')
     
+    def form_valid(self, form):
+        messages.success(self.request, 'Usuário Externo cadastrado com sucesso!')
+        return super().form_valid(form)
+    
 class UsuarioExternoUpdateView(LoginRequiredMixin, CustomPermissionMixin, UpdateView):
     permission_required = 'usuarios.change_usuarioexterno'
     model = UsuarioExterno
     form_class = UsuarioExternoForm
     template_name = 'usuarios/usuario_externo/usuario_externo_form.html'
     success_url = reverse_lazy('usuario_externo_list')
+    
+    def form_valid(self, form):
+        messages.success(self.request, 'Usuário Externo atualizado com sucesso!')
+        return super().form_valid(form)
 
 class UsuarioExternoDeleteView(LoginRequiredMixin, CustomPermissionMixin, DeleteView):
     permission_required = 'usuarios.delete_usuarioexterno'
     model = UsuarioExterno
     template_name = 'usuarios/usuario_externo_confirm_delete.html'
     success_url = reverse_lazy('usuario_externo_list')
+    
+    def form_valid(self, form):
+        messages.success(self.request, 'Usuário Externo removido com sucesso!')
+        return super().form_valid(form)

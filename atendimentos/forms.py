@@ -32,17 +32,17 @@ class AtendimentoForm(forms.ModelForm):
             if not self.instance.pk:
                 self.fields['tipo_pessoa'].initial = 'ALU'  # 'ALU' para Aluno, 'SER' para Servidor, etc.
 
-        # Loop de estilização do Bootstrap (continua igual)
         for field_name, field in self.fields.items():
             widget_type = field.widget.__class__.__name__
+            error_class = ' is-invalid' if self.is_bound and field_name in self.errors else ''
             if widget_type == 'RadioSelect':
-                field.widget.attrs.update({'class': 'form-check-input'})
+                field.widget.attrs.update({'class': f'form-check-input{error_class}'})
             elif widget_type in ['Select', 'SelectMultiple']:
-                field.widget.attrs.update({'class': 'form-select'})
+                field.widget.attrs.update({'class': f'form-select{error_class}'})
             elif widget_type == 'DateInput':
-                field.widget.attrs.update({'class': 'form-control datepicker'})
+                field.widget.attrs.update({'class': f'form-control datepicker{error_class}'})
             else:
-                field.widget.attrs.update({'class': 'form-control'})
+                field.widget.attrs.update({'class': f'form-control{error_class}'})
     
     def clean(self):
         cleaned_data = super().clean()

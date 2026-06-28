@@ -54,6 +54,10 @@ class AtendimentoCreateView(LoginRequiredMixin, CustomPermissionMixin, CreateVie
     form_class = AtendimentoForm
     template_name = "atendimentos/form.html"
     success_url = reverse_lazy("lista_atendimentos")
+    
+    def form_valid(self, form):
+        messages.success(self.request, "Atendimento registrado com sucesso.")
+        return super().form_valid(form)
 
 class AtendimentoUpdateView(LoginRequiredMixin, CustomPermissionMixin, UpdateView):
     permission_required = "atendimentos.change_atendimento"
@@ -61,12 +65,20 @@ class AtendimentoUpdateView(LoginRequiredMixin, CustomPermissionMixin, UpdateVie
     form_class = AtendimentoForm
     template_name = "atendimentos/form.html"
     success_url = reverse_lazy("lista_atendimentos")
+    
+    def form_valid(self, form):
+        messages.success(self.request, "Atendimento atualizado com sucesso.")
+        return super().form_valid(form)
 
 class AtendimentoDeleteView(LoginRequiredMixin, CustomPermissionMixin, DeleteView):
     permission_required = "atendimentos.delete_atendimento"
     model = Atendimento
     template_name = "atendimentos/confirm_delete.html"
     success_url = reverse_lazy("lista_atendimentos")
+    
+    def form_valid(self, form):
+        messages.success(self.request, "Atendimento removido com sucesso.")
+        return super().form_valid(form)
 
 # --- BUSCAS VIA AJAX ---
 

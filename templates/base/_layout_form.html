@@ -21,7 +21,7 @@
 
             <div class="card form-card">
                 <div class="card-body">
-                    <form method="post">
+                    <form method="post" novalidate>
                         {% csrf_token %}
                         {% block campos_form %}{% endblock %}
                         <div class="d-flex gap-2 mt-4">
@@ -35,5 +35,6 @@
         </div>
     </div>
 </div>
+<span id="tem-erro-non-field" data-tem-erro="{{ form.non_field_errors|length }}" style="display:none;"></span>
 {% block scripts_form %}{% endblock %}
 {% endblock %}

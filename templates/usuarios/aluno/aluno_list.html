@@ -1,0 +1,98 @@
+{% extends 'base/_layout_list.html' %}
+
+{% block title %}Lista de Alunos{% endblock %}
+{% block titulo_lista %}Alunos{% endblock %}
+
+{% block formulario_busca %}
+<form method="get" class="mb-3">
+    <div class="row g-2 align-items-end">
+        <div class="col-12 col-md-5">
+            <input type="search" name="q" value="{{ q }}"
+                class="form-control" placeholder="Buscar por nome ou RA...">
+        </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-primary">Buscar</button>
+            <a href="{% url 'aluno_list' %}?page_size={{ page_size }}" class="btn btn-outline-secondary ms-1">Limpar</a>
+        </div>
+        <div class="col-auto">
+            <select name="page_size" class="form-select" onchange="this.form.submit()">
+                {% for option in page_size_options %}
+                <option value="{{ option }}" {% if page_size == option %}selected{% endif %}>
+                    {{ option }} / página
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-12 col-md-auto ms-md-auto mt-2 mt-md-0">
+            <a href="{% url 'aluno_create' %}" class="btn btn-success w-100 w-md-auto">
+                + Novo Aluno
+            </a>
+        </div>
+    </div>
+</form>
+{% endblock %}
+
+{% block cabecalho_tabela %}
+    <th>RA</th>
+    <th>Nome</th>
+    <th>Curso</th>
+    <th>Email</th>
+{% endblock %}
+
+{% block linhas_tabela %}
+    {% for aluno in alunos %}
+    <tr>
+        <td>{{ aluno.ra }}</td>
+        <td>{{ aluno.nome }}</td>
+        <td>{{ aluno.curso }}</td>
+        <td>{{ aluno.email }}</td>
+        <td class="text-nowrap p-2">
+            <a href="{% url 'aluno_detail' aluno.pk %}" class="btn btn-info btn-sm">Detalhe</a>
+            <a href="{% url 'aluno_update' aluno.pk %}" class="btn btn-warning btn-sm">Editar</a>
+            <button class="btn btn-danger btn-sm"
+                    data-modal="modalExcluirAluno"
+                    data-url="{% url 'aluno_delete' aluno.pk %}"
+                    data-mensagem="Tem certeza que deseja excluir <strong>{{ aluno.nome }}</strong>?">
+                Excluir
+            </button>
+        </td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="5" class="text-center">Nenhum aluno encontrado.</td></tr>
+    {% endfor %}
+{% endblock %}
+
+{% block cards_mobile %}
+    {% for aluno in alunos %}
+    <div class="card mb-3">
+        <div class="card-body">
+            <h6 class="card-title mb-0">{{ aluno.nome }}</h6>
+            <small class="text-muted">{{ aluno.ra }}</small>
+            <hr class="my-2">
+            <div class="row g-1 small text-muted">
+                <div class="col-6">{{ aluno.curso }}</div>
+                <div class="col-6">{{ aluno.email }}</div>
+            </div>
+            <div class="d-flex gap-2 mt-3">
+                <a href="{% url 'aluno_detail' aluno.pk %}" class="btn btn-info btn-sm">Detalhe</a>
+                <a href="{% url 'aluno_update' aluno.pk %}" class="btn btn-warning btn-sm flex-fill">Editar</a>
+                <button class="btn btn-danger btn-sm flex-fill"
+                        data-modal="modalExcluirAluno"
+                        data-url="{% url 'aluno_delete' aluno.pk %}"
+                        data-mensagem="Tem certeza que deseja excluir <strong>{{ aluno.nome }}</strong>?">
+                    Excluir
+                </button>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <p class="text-center text-muted">Nenhum aluno encontrado.</p>
+    {% endfor %}
+{% endblock %}
+
+{% block params_paginacao_first %}{% if q %}&q={{ q }}{% endif %}{% if page_size %}&page_size={{ page_size }}{% endif %}{% endblock %}
+{% block params_paginacao_last %}{% if q %}&q={{ q }}{% endif %}{% if page_size %}&page_size={{ page_size }}{% endif %}{% endblock %}
+
+{% block modais %}
+    {% include "components/modal.html" with modal_id="modalExcluirAluno" titulo="Confirmar Exclusão" btn_confirmar="Sim, Excluir" btn_cancelar="Cancelar" %}
+{% endblock %}
