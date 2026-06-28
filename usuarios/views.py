@@ -49,7 +49,7 @@ def endereco_autocomplete(request):
 class AlunoListView(LoginRequiredMixin, CustomPermissionMixin, ListView):
     permission_required = 'usuarios.view_aluno'
     model = Aluno
-    template_name = 'usuarios/aluno_list.html'
+    template_name = 'usuarios/aluno/aluno_list.html'
     context_object_name = 'alunos'
     paginate_by = 5
 
@@ -75,7 +75,7 @@ class AlunoCreateView(LoginRequiredMixin, CustomPermissionMixin, CreateView):
     permission_required = 'usuarios.add_aluno'
     model = Aluno
     form_class = AlunoForm
-    template_name = 'usuarios/aluno_form.html'
+    template_name = 'usuarios/aluno/aluno_form.html'
     success_url = reverse_lazy('aluno_list')
     
     def form_valid(self, form):
@@ -86,7 +86,7 @@ class AlunoUpdateView(LoginRequiredMixin, CustomPermissionMixin, UpdateView):
     permission_required = 'usuarios.change_aluno'
     model = Aluno
     form_class = AlunoForm
-    template_name = 'usuarios/aluno_form.html'
+    template_name = 'usuarios/aluno/aluno_form.html'
     success_url = reverse_lazy('aluno_list')
     
     def form_valid(self, form):
@@ -96,7 +96,7 @@ class AlunoUpdateView(LoginRequiredMixin, CustomPermissionMixin, UpdateView):
 class AlunoDeleteView(LoginRequiredMixin, CustomPermissionMixin, DeleteView):
     permission_required = 'usuarios.delete_aluno'
     model = Aluno
-    template_name = 'usuarios/aluno_confirm_delete.html'
+    template_name = 'usuarios/aluno/aluno_confirm_delete.html'
     success_url = reverse_lazy('aluno_list')
     
     def form_valid(self, form):
@@ -139,7 +139,7 @@ class HistoricoServidorView(LoginRequiredMixin, CustomPermissionMixin, ListView)
 class ServidorListView(LoginRequiredMixin, CustomPermissionMixin, ListView):
     permission_required = 'usuarios.view_servidor'
     model = Servidor
-    template_name = 'usuarios/servidor_list.html'
+    template_name = 'usuarios/servidor/servidor_list.html'
     context_object_name = 'servidores'
     paginate_by = 10
 
@@ -158,7 +158,7 @@ class ServidorCreateView(LoginRequiredMixin, CustomPermissionMixin, CreateView):
     permission_required = 'usuarios.add_servidor'
     model = Servidor
     form_class = ServidorForm
-    template_name = 'usuarios/servidor_form.html'
+    template_name = 'usuarios/servidor/servidor_form.html'
     success_url = reverse_lazy('servidor_list')
     
     def form_valid(self, form):
@@ -169,7 +169,7 @@ class ServidorUpdateView(LoginRequiredMixin, CustomPermissionMixin, UpdateView):
     permission_required = 'usuarios.change_servidor'
     model = Servidor
     form_class = ServidorForm
-    template_name = 'usuarios/servidor_form.html'
+    template_name = 'usuarios/servidor/servidor_form.html'
     success_url = reverse_lazy('servidor_list')
     
     def form_valid(self, form):
@@ -179,7 +179,7 @@ class ServidorUpdateView(LoginRequiredMixin, CustomPermissionMixin, UpdateView):
 class ServidorDeleteView(LoginRequiredMixin, CustomPermissionMixin, DeleteView):
     permission_required = 'usuarios.delete_servidor'
     model = Servidor
-    template_name = 'usuarios/servidor_confirm_delete.html'
+    template_name = 'usuarios/servidor/servidor_confirm_delete.html'
     success_url = reverse_lazy('servidor_list')
     
     def form_valid(self, form):
