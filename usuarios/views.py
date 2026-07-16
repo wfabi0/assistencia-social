@@ -46,6 +46,26 @@ def endereco_autocomplete(request):
     results = [{'id': e.pk, 'label': str(e)} for e in enderecos]
     return JsonResponse({'results': results})
 
+
+@login_required
+@permission_required('usuarios.view_aluno', raise_exception=False)
+def curso_autocomplete(request):
+    if not request.user.has_perm('usuarios.view_aluno'):
+        return JsonResponse({'error': 'Sem permissão'}, status=403)
+        
+    query = request.GET.get('q', '').strip()
+    if not query:
+        return JsonResponse({'results': []})
+
+    cursos = Aluno.objects.filter(
+        curso__icontains=query
+    ).values_list('curso', flat=True).distinct().order_by('curso')[:10]
+
+    results = [{'id': curso, 'label': curso} for curso in cursos if curso]
+    
+    return JsonResponse({'results': results})
+
+
 class AlunoListView(LoginRequiredMixin, CustomPermissionMixin, ListView):
     permission_required = 'usuarios.view_aluno'
     model = Aluno

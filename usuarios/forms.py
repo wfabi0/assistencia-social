@@ -301,7 +301,8 @@ class AlunoForm(forms.ModelForm):
             }),
             'curso': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'Curso do aluno'
+                'placeholder': 'Curso do aluno',
+                'autocomplete': 'off'
             }),
             'email': forms.EmailInput(attrs={
                 'class': 'form-control',
