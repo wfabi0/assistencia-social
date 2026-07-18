@@ -6,6 +6,8 @@ urlpatterns = [
 
      path('enderecos/busca/', views.endereco_autocomplete,
           name='endereco_autocomplete'),
+     
+     path('cursos/busca/', views.curso_autocomplete, name='curso_autocomplete'),
 
      path('alunos/', views.AlunoListView.as_view(), name='aluno_list'),
 
