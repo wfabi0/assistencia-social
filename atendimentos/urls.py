@@ -1,7 +1,14 @@
-from django.urls import path
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
 from . import views
+from .api_views import AtendimentoViewSet
+
+router = DefaultRouter()
+router.register(r'atendimentos', AtendimentoViewSet, basename='api-atendimento')
 
 urlpatterns = [
+    path('api/', include(router.urls)),
+    
     path("atendimentos/", views.AtendimentoListView.as_view(), name="lista_atendimentos"),
     path("atendimentos/novo/", views.AtendimentoCreateView.as_view(), name="novo_atendimento"),
     path("atendimentos/<int:pk>/editar/", views.AtendimentoUpdateView.as_view(), name="editar_atendimento"),

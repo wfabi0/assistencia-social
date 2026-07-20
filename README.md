@@ -161,3 +161,9 @@ git push origin seu-nome/nome-da-tarefa
 - Nunca envie arquivos desnecessários para o repositório.
 
 ---
+
+## 📚 Documentação da API
+
+Documentação usando Swagger/OpenAPI.
+
+Acesse por `/api/docs/`
