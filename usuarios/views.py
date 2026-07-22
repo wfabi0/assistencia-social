@@ -201,6 +201,22 @@ class HistoricoServidorView(LoginRequiredMixin, CustomPermissionMixin, ListView)
         context['tipo_pessoa'] = 'Servidor'
         return context
 
+class HistoricoUsuarioExternoView(LoginRequiredMixin, CustomPermissionMixin, ListView):
+    permission_required = 'usuarios.view_usuarioexterno'
+    model = Atendimento
+    template_name = 'atendimentos/historico.html'
+    context_object_name = 'atendimentos'
+    paginate_by = 5
+
+    def get_queryset(self):
+        return Atendimento.objects.filter(usuario_externo__id=self.kwargs['pk']).order_by('-data_atendimento')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['pessoa'] = UsuarioExterno.objects.get(pk=self.kwargs['pk'])
+        context['tipo_pessoa'] = 'UsuarioExterno'
+        return context
+
 
 class ServidorListView(LoginRequiredMixin, CustomPermissionMixin, ListView):
     permission_required = 'usuarios.view_servidor'

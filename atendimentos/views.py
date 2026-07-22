@@ -87,7 +87,17 @@ class AtendimentoDeleteView(LoginRequiredMixin, CustomPermissionMixin, DeleteVie
         return super().form_valid(form)
 
 class ExportarPDFView(LoginRequiredMixin, CustomPermissionMixin, View):
-    permission_required = 'usuarios.view_aluno'
+    permission_required = []  # Lista vazia como padrão
+
+    def get_permission_required(self):
+        tipo = self.kwargs.get('tipo')
+        if tipo == 'aluno':
+            return ['usuarios.view_aluno']
+        elif tipo == 'servidor':
+            return ['usuarios.view_servidor']
+        elif tipo == 'usuarioexterno':
+            return ['usuarios.view_usuarioexterno']
+        return ['usuarios.view_aluno']  # fallback
 
     def get(self, request, tipo, pk):
         if tipo == 'aluno':
@@ -100,6 +110,11 @@ class ExportarPDFView(LoginRequiredMixin, CustomPermissionMixin, View):
             atendimentos = Atendimento.objects.filter(servidor=pessoa).order_by('-data_atendimento')
             tipo_pessoa = 'Servidor'
             filename = f'historico_{pessoa.siape}.pdf'
+        elif tipo == 'usuarioexterno':
+            pessoa = get_object_or_404(UsuarioExterno, pk=pk)
+            atendimentos = Atendimento.objects.filter(usuario_externo=pessoa).order_by('-data_atendimento')
+            tipo_pessoa = 'UsuarioExterno'
+            filename = f'historico_{pessoa.cpf}.pdf'
         else:
             from django.http import Http404
             raise Http404
@@ -120,7 +135,7 @@ class ExportarPDFView(LoginRequiredMixin, CustomPermissionMixin, View):
         response['Content-Disposition'] = f'inline; filename="{filename}"'
         
         return response
-
+    
 # --- BUSCAS VIA AJAX ---
 
 @login_required

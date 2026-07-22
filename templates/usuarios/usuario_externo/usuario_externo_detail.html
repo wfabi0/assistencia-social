@@ -44,7 +44,7 @@
             data-mensagem="Tem certeza que deseja excluir <strong>{{ object.nome }}</strong>?">
         Excluir
     </button>
-    <a href="{# url para o historico #}" class="btn btn-info">Histórico</a>
+    <a href="{% url 'usuario_externo_historico' object.pk %}" class="btn btn-info">Histórico</a>
 {% endblock %}
 
 {% block extra_detail %}
