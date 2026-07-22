@@ -136,15 +136,45 @@
     </div>
 </nav>
 
+    {% comment %} MENSAGENS {% endcomment %}
     {% if messages %}
-    <div class="container mt-3">
-        {% for message in messages %}
-        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        <div class="container mt-3">
+            {% for message in messages %}
+                {% with message.tags|cut:" " as tag %}
+                    <div class="alert alert-{% if tag == 'error' %}danger{% elif tag == 'success' %}success{% elif tag == 'warning' %}warning{% else %}info{% endif %} alert-dismissible fade show rounded-4 shadow-sm" 
+                        role="alert" 
+                        style="border-left: 6px solid {% if tag == 'error' %}#dc3545{% elif tag == 'success' %}#198754{% elif tag == 'warning' %}#ffc107{% else %}#0d6efd{% endif %};">
+                        <div class="d-flex align-items-center gap-3">
+                            <!-- Ícone -->
+                            <div class="flex-shrink-0">
+                                {% if tag == 'error' %}
+                                    <i class="bi bi-x-octagon-fill text-danger" style="font-size: 1.8rem;"></i>
+                                {% elif tag == 'success' %}
+                                    <i class="bi bi-check-circle-fill text-success" style="font-size: 1.8rem;"></i>
+                                {% elif tag == 'warning' %}
+                                    <i class="bi bi-exclamation-triangle-fill text-warning" style="font-size: 1.8rem;"></i>
+                                {% else %}
+                                    <i class="bi bi-info-circle-fill text-primary" style="font-size: 1.8rem;"></i>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="flex-grow-1">
+                                <strong class="d-block">
+                                    {% if tag == 'error' %}⛔ Erro
+                                    {% elif tag == 'success' %}✅ Sucesso
+                                    {% elif tag == 'warning' %}⚠️ Atenção
+                                    {% else %}ℹ️ Informação
+                                    {% endif %}
+                                </strong>
+                                {{ message }}
+                            </div>
+                            
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+                        </div>
+                    </div>
+                {% endwith %}
+            {% endfor %}
         </div>
-        {% endfor %}
-    </div>
     {% endif %}
 
     <!-- Conteúdo -->

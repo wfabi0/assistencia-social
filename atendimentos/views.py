@@ -123,7 +123,7 @@ class ExportarPDFView(LoginRequiredMixin, CustomPermissionMixin, View):
 # --- BUSCAS VIA AJAX ---
 
 @login_required
-@permission_required("atendimentos.view_aluno", raise_exception=True)
+@permission_required("usuarios.view_aluno", raise_exception=True)
 def buscar_alunos(request):
     q = request.GET.get("q", "").strip()
     if len(q) < 2: return JsonResponse([], safe=False)
@@ -132,7 +132,7 @@ def buscar_alunos(request):
     return JsonResponse(dados, safe=False)
 
 @login_required
-@permission_required("atendimentos.view_servidor", raise_exception=True)
+@permission_required("usuarios.view_servidor", raise_exception=True)
 def buscar_servidores(request):
     q = request.GET.get("q", "").strip()
     if len(q) < 2: return JsonResponse([], safe=False)
@@ -141,7 +141,7 @@ def buscar_servidores(request):
     return JsonResponse(dados, safe=False)
 
 @login_required
-@permission_required("atendimentos.view_usuarioexterno", raise_exception=True)
+@permission_required("usuarios.view_usuarioexterno", raise_exception=True)
 def buscar_usuarios_externos(request):
     q = request.GET.get("q", "").strip()
     if len(q) < 2: return JsonResponse([], safe=False)
