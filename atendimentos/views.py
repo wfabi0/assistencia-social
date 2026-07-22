@@ -1,20 +1,21 @@
-from django.urls import reverse_lazy
-from django.views.generic import CreateView, ListView, UpdateView, DeleteView
-from django.http import JsonResponse, HttpResponse
-from django.db.models import Q
-from django.shortcuts import redirect, render, get_object_or_404
-from django.contrib.auth import authenticate, login, logout
+from datetime import date
+from io import BytesIO
+
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
-from django.contrib import messages
-from .models import Atendimento
-from .forms import AtendimentoForm
-from usuarios.models import Aluno, Servidor, UsuarioExterno
-from django.views import View
+from django.db.models import Q
+from django.http import JsonResponse, HttpResponse
+from django.shortcuts import redirect, render, get_object_or_404
 from django.template.loader import render_to_string
-from datetime import date
+from django.urls import reverse_lazy
+from django.views import View
+from django.views.generic import CreateView, ListView, UpdateView, DeleteView
 from xhtml2pdf import pisa
-from io import BytesIO
+
+from .forms import AtendimentoForm
+from .models import Atendimento
+from usuarios.models import Aluno, Servidor, UsuarioExterno
 
 class CustomPermissionMixin(PermissionRequiredMixin):
     """

@@ -75,7 +75,7 @@
                         <td>{{ atendimento.data_atendimento|date:"d/m/Y" }}</td>
                         <td>{{ atendimento.descricao }}</td>
                         <td>
-                            <span class="badge bg-secondary">{{ atendimento.status }}</span>
+                            <span class="badge bg-secondary">{{ atendimento.get_status_display }}</span>
                         </td>
                         <td>
                             <a href="{% url 'editar_atendimento' atendimento.id %}" class="btn btn-warning btn-sm">Editar</a>

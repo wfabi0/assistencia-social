@@ -1,20 +1,18 @@
 from django.http import JsonResponse
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.db.models import Q
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect, render, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, ListView, UpdateView, DeleteView, DetailView
+from django.views.generic.list import MultipleObjectMixin
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib import messages
-from .forms import ServidorForm, AlunoForm
-from .models import Endereco, Responsavel, Servidor, Aluno
+
+from .models import Endereco, Responsavel, Servidor, Aluno, UsuarioExterno
 from .forms import ServidorForm, AlunoForm, UsuarioExternoForm
-from .models import Endereco, Servidor, Aluno, UsuarioExterno
-from django.views.generic.list import MultipleObjectMixin
-from atendimentos.models import Atendimento  
-from usuarios.models import Aluno, Servidor  
+from atendimentos.models import Atendimento
 
 
 class CustomPermissionMixin(PermissionRequiredMixin):
