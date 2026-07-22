@@ -1,4 +1,5 @@
 from django.http import JsonResponse
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.db.models import Q
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
@@ -287,7 +288,15 @@ def login_view(request):
         if user is not None:
             login(request, user)
             request.session.set_expiry(1209600 if lembrar == 'on' else 0)
-            return redirect(request.GET.get('next', 'home'))
+            
+            next_url = request.GET.get("next")
+            if next_url and url_has_allowed_host_and_scheme(
+                next_url,
+                allowed_hosts={request.get_host()},
+                require_https=request.is_secure(),
+                ):
+                return redirect(next_url)
+            return redirect("home")            
         else: messages.error(request, 'Usuário ou senha inválidos.')
     return render(request, 'auth/login.html')
 
