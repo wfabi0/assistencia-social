@@ -1,47 +1,73 @@
+.login-page {
+	width: min(100%, 420px);
+}
+
+.login-card {
+	background: #ffffff;
+	border-radius: 1.5rem;
+	padding: 2rem;
+	box-shadow: 0 25px 45px rgba(15, 23, 42, 0.08);
+	border: 1px solid rgba(148, 163, 184, 0.18);
+	animation: fadeInUp .6s cubic-bezier(.22,.9,.34,1) both;
+}
+
+.login-form {
+	display: grid;
+	gap: 1rem;
+}
+
 .custom-input-group {
-  border: 1px solid #292929;
-  background-color: #ffffff;
-  transition:
-    border-color 0.15s ease-in-out,
-    box-shadow 0.15s ease-in-out;
+	border: 1px solid rgba(148, 163, 184, 0.3);
+	background-color: #f8fafc;
+	transition:
+		border-color 0.15s ease-in-out,
+		box-shadow 0.15s ease-in-out;
 }
+
 .input-inset {
-  border: none !important;
-  background-color: transparent !important;
-  box-shadow: none !important;
-  border-radius: 0 !important;
+	border: none !important;
+	background-color: transparent !important;
+	box-shadow: none !important;
+	border-radius: 0 !important;
 }
+
 .custom-input-group:focus-within {
-  border-color: #25a25a !important;
-  box-shadow: 0 0 0 0.25rem rgba(37, 162, 90, 0.25) !important;
+	border-color: var(--brand) !important;
+	box-shadow: 0 0 0 0.18rem rgba(11,61,255,0.12) !important;
 }
 
 .btn-primary-custom {
-  background-color: #25a25a;
-  color: white;
-  transition: all 0.2s ease;
+	background: linear-gradient(135deg, var(--brand), #1E5EFF);
+	color: white;
+	transition: transform 0.2s ease, box-shadow 0.2s ease;
+	border: 0;
+	border-radius: 1rem;
+	box-shadow: 0 12px 28px rgba(11,61,255,0.10);
 }
-.btn-primary-custom:hover {
-  background-color: #75ad0a;
-  color: white;
+.btn-primary-custom:hover,
+.btn-primary-custom:focus {
+	background: linear-gradient(135deg, var(--brand-dark), var(--brand));
+	transform: translateY(-2px);
+	box-shadow: 0 20px 36px rgba(11,61,255,0.12);
 }
-.text-on-surface-variant {
-  color: #3e4a3f;
+
+.form-check-input {
+	border-radius: 0.45rem;
 }
-.form-check-input:checked {
-  background-color: #25a25a;
-  border-color: #25a25a;
+
+.login-card {
+	width: 100%;
+	max-width: 420px;
 }
-.form-check-input:focus {
-  box-shadow: 0 0 0 0.25rem rgba(37, 162, 90, 0.25);
-  border-color: #25a25a;
+
+.login-page {
+	width: 100%;
 }
-.tracking-tight {
-  letter-spacing: -0.02em;
+
+.form-check-label {
+	color: #0f64da;
 }
-.tracking-wider {
-  letter-spacing: 0.05em;
-}
-.tracking-widest {
-  letter-spacing: 0.1em;
+
+.alert {
+	border-radius: 1rem;
 }

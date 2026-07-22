@@ -11,12 +11,13 @@
     <link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" rel="stylesheet">
 
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    {% block extra_css %}{% endblock %}
 </head>
 <body>
 
     <!-- Cabeçalho -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="container-fluid">
+    <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom shadow-sm">
+        <div class="container-fluid px-3 px-lg-4">
 
             <a class="navbar-brand" href="/">
                 Sistema de Assistência Social
@@ -90,48 +91,37 @@
 
                 </ul>
 
-                <!-- Usuário -->
-                {% if user.is_authenticated %}
-                    <ul class="navbar-nav">
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle"
-                                href="#"
-                                role="button"
-                                data-bs-toggle="dropdown">
+                <!-- Menu integrado (visível em telas grandes) -->
+                <ul class="navbar-nav ms-3 top-menu d-none d-xl-flex align-items-center">
+                    <li class="nav-item"><a class="nav-link" href="/">Início</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'lista_atendimentos' %}">Atendimentos</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'aluno_list' %}">Alunos</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'servidor_list' %}">Servidores</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'usuario_externo_list' %}">Usuários Externos</a></li>
+                </ul>
 
+                <!-- Usuário -->
+                <ul class="navbar-nav">
+                    {% if user.is_authenticated %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
                                 {{ user.username }}
                             </a>
-
                             <ul class="dropdown-menu dropdown-menu-end">
                                 <li>
                                     <form method="post" action="{% url 'logout' %}" class="m-0">
                                         {% csrf_token %}
-                                        <button type="submit" class="dropdown-item">
-                                            Sair
-                                        </button>
+                                        <button type="submit" class="dropdown-item">Sair</button>
                                     </form>
                                 </li>
                             </ul>
                         </li>
-                    </ul>
-                {% else %}
-                    <ul class="navbar-nav">
-                        {% if user.is_authenticated %}
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                                    {{ user.username }}
-                                </a>
-                                <ul class="dropdown-menu dropdown-menu-end">
-                                    <li><a class="dropdown-item" href="{% url 'logout' %}">Sair</a></li>
-                                </ul>
-                            </li>
-                        {% else %}
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'login' %}">Login</a>
-                            </li>
-                        {% endif %}
-                    </ul>
-                {% endif %}
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'login' %}">Login</a>
+                        </li>
+                    {% endif %}
+                </ul>
 
             </div>
 
@@ -148,34 +138,61 @@
     </div>
     {% endif %}
 
-    <!-- Breadcrumb -->
-    <div class="container mt-3">
-
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-
-                <li class="breadcrumb-item">
-                    <a href="/">Home</a>
-                </li>
-
-                {% block breadcrumb %}
-                {% endblock %}
-
-            </ol>
-        </nav>
-
+    <div class="site-header py-4 bg-white border-bottom shadow-sm">
+        <div class="container-fluid px-3 px-lg-4 d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-3">
+            <div>
+                <h1 class="h4 mb-1">{% block site_header_title %}Assistência Social{% endblock %}</h1>
+                <p class="text-muted mb-0">{% block site_header_subtitle %}Navegue pelo sistema usando o menu lateral e acompanhe os principais registros.{% endblock %}</p>
+            </div>
+            <div class="d-flex gap-2 flex-wrap align-items-center">
+                <button class="btn btn-outline-secondary btn-sm d-xl-none" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarCollapse" aria-expanded="false" aria-controls="sidebarCollapse">
+                    <i class="ti ti-menu-2"></i>
+                    <span class="ms-1">Menu</span>
+                </button>
+                <a href="#" class="btn btn-outline-secondary btn-sm">Relatórios</a>
+                <a href="#" class="btn btn-outline-secondary btn-sm">Ajuda</a>
+            </div>
+        </div>
     </div>
 
-    <!-- Conteúdo -->
-    <main>
-        {% block content %}
-        {% endblock %}
+    <main class="app-shell container-fluid px-3 px-lg-4 py-4">
+        <div class="row g-4">
+            <section class="col-12">
+                <div class="page-header mb-4 py-3 px-4 rounded-4 bg-white border shadow-sm">
+                    <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-3">
+                        <div>
+                            <h2 class="h5 mb-1">{% block page_header_title %}Assistência Social{% endblock %}</h2>
+                            <nav aria-label="breadcrumb">
+                                <ol class="breadcrumb mb-0">
+                                    <li class="breadcrumb-item"><a href="/">Home</a></li>
+                                    {% block breadcrumb %}{% endblock %}
+                                </ol>
+                            </nav>
+                        </div>
+                        <div class="text-muted small">Painel de navegação integrada</div>
+                    </div>
+                </div>
+
+                <div class="content-wrapper">
+                    {% block content %}
+                    {% endblock %}
+                </div>
+            </section>
+        </div>
     </main>
+
+    <footer class="footer py-4 mt-4">
+        <div class="container-fluid px-3 px-lg-4 border-top pt-3 d-flex flex-column flex-md-row justify-content-between align-items-center gap-2 text-muted small">
+            <span>© {% now "Y" %} Assistência Social</span>
+            <span>Desenvolvido para gestão de atendimentos com navegação simples.</span>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'js/app.js' %}"></script>
 
     {% block extra_js %}
     {% endblock %}
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>

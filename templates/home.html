@@ -1,22 +1,51 @@
-{% extends 'base/_base.html' %}
+﻿{% extends 'base/_base.html' %}
 
 {% block title %}Início{% endblock %}
+
+{% block site_header_title %}Painel Inicial{% endblock %}
+{% block site_header_subtitle %}Veja um resumo rápido dos atendimentos e navegue pelo sistema com facilidade.{% endblock %}
+{% block page_header_title %}Visão Geral{% endblock %}
 
 {% block breadcrumb %}
 <li class="breadcrumb-item active">Início</li>
 {% endblock %}
 
 {% block content %}
-
-<div class="container mt-4">
-
-    <div class="card">
-        <div class="card-body">
-            <h2>Bem-vindo ao Sistema de Assistência Social</h2>
-            <p>Utilize o menu superior para navegar pelo sistema.</p>
+<div class="row g-4">
+    <div class="col-12">
+        <div class="card home-hero p-4">
+            <div class="row align-items-center gy-3">
+                <div class="col-md-7">
+                    <h2 class="mb-2">Bem-vindo ao Sistema de Assistência Social</h2>
+                    <p class="text-muted mb-0">Use os cards abaixo para acessar registros, acompanhar atendimentos e consultar relatórios de forma rápida.</p>
+                </div>
+                <div class="col-md-5 text-md-end">
+                    <a href="{% url 'lista_atendimentos' %}" class="btn btn-primary-custom btn-sm">Ver atendimentos</a>
+                </div>
+            </div>
         </div>
     </div>
 
+    <div class="col-12 col-md-4">
+        <div class="card feature-card p-4">
+            <h3 class="h6 text-uppercase text-muted mb-3">Atendimentos</h3>
+            <p class="mb-3 text-muted">Acompanhe os registros recentes e crie novos atendimentos no sistema.</p>
+            <a href="{% url 'lista_atendimentos' %}" class="text-primary small">Abrir lista de atendimentos →</a>
+        </div>
+    </div>
+    <div class="col-12 col-md-4">
+        <div class="card feature-card p-4">
+            <h3 class="h6 text-uppercase text-muted mb-3">Usuários</h3>
+            <p class="mb-3 text-muted">Gerencie alunos, servidores e usuários externos com navegação clara e controles simples.</p>
+            <a href="{% url 'aluno_list' %}" class="text-primary small">Ver usuários →</a>
+        </div>
+    </div>
+    <div class="col-12 col-md-4">
+        <div class="card feature-card p-4">
+            <h3 class="h6 text-uppercase text-muted mb-3">Relatórios</h3>
+            <p class="mb-3 text-muted">Gere visões de dados para análises rápidas e compartilhe informações com a sua equipe.</p>
+            <a href="#" class="text-primary small">Explorar relatórios →</a>
+        </div>
+    </div>
 </div>
-
 {% endblock %}

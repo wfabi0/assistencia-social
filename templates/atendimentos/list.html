@@ -43,8 +43,8 @@
 
 {% block linhas_tabela %}
     {% for atendimento in atendimentos %}
-    <tr>
-        <td>{{ atendimento.data_atendimento }}</td>
+    <tr class="atendimento-row">
+        <td class="atendimento-date">{{ atendimento.data_atendimento }}</td>
         <td>
             {% if atendimento.tipo_pessoa == "ALU" %}{{ atendimento.aluno.ra }}
             {% elif atendimento.tipo_pessoa == "SER" %}{{ atendimento.servidor.siape }}
@@ -52,10 +52,18 @@
         </td>
         <td>{{ atendimento.pessoa_atendida.nome }}</td>
         <td>{{ atendimento.cargo_ou_curso }}</td>
-        <td>{{ atendimento.get_status_display }}</td>
-        <td class="text-nowrap p-2">
-            <a href="{% url 'editar_atendimento' atendimento.pk %}" class="btn btn-warning btn-sm">Editar</a>
-            <button class="btn btn-danger btn-sm"
+        <td>
+            {% if atendimento.status == "PENDENTE" %}
+                <span class="badge bg-warning text-dark">{{ atendimento.get_status_display }}</span>
+            {% elif atendimento.status == "EM_ANDAMENTO" %}
+                <span class="badge bg-primary">{{ atendimento.get_status_display }}</span>
+            {% elif atendimento.status == "CONCLUIDO" %}
+                <span class="badge bg-success">{{ atendimento.get_status_display }}</span>
+            {% endif %}
+        </td>
+        <td class="text-nowrap p-2 atendimento-actions">
+            <a href="{% url 'editar_atendimento' atendimento.pk %}" class="btn-edit btn-sm">Editar</a>
+            <button class="btn-delete btn-sm"
                     data-modal="modalExcluirAtendimento"
                     data-url="{% url 'excluir_atendimento' atendimento.id %}"
                     data-mensagem="Tem certeza que deseja excluir o atendimento de <strong>{{ atendimento.pessoa_atendida.nome }}</strong> realizado em {{ atendimento.data_atendimento }}?">
