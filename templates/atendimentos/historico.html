@@ -2,18 +2,6 @@
 
 {% block content %}
 <div class="container mt-4">
-    
-    <nav aria-label="breadcrumb" class="mb-4">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{% url 'home' %}">Principal</a></li>
-            {% if tipo_pessoa == 'Aluno' %}
-                <li class="breadcrumb-item"><a href="{% url 'aluno_list' %}">Lista de Alunos</a></li>
-            {% else %}
-                <li class="breadcrumb-item"><a href="{% url 'servidor_list' %}">Lista de Servidores</a></li>
-            {% endif %}
-            <li class="breadcrumb-item active" aria-current="page">Registro de Atendimento</li>
-        </ol>
-    </nav>
 
    <div class="card mb-4">
         <div class="card-header bg-light">
@@ -55,6 +43,9 @@
     <div class="card">
         <div class="card-header bg-light d-flex justify-content-between align-items-center">
             <h5 class="mb-0">Histórico de Atendimentos</h5>
+            <a href="{% url 'historico_pdf' tipo_pessoa|lower pessoa.pk %}" class="btn btn-danger btn-sm" target="_blank">
+                Exportar PDF
+            </a>
         </div>
         <div class="card-body">
             <table class="table table-striped table-bordered">

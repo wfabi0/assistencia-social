@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        @page {
+            size: a4;
+            margin: 20mm 15mm 20mm 15mm;
+            @frame footer {
+                -pdf-frame-content: rodape-conteudo;
+                bottom: 10mm;
+                left: 15mm;
+                right: 15mm;
+                height: 10mm;
+            }
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 10pt;
+            color: #333;
+        }
+
+        .cabecalho {
+            text-align: center;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .cabecalho h1 {
+            font-size: 14pt;
+            margin: 0 0 5px 0;
+            color: #1d4ed8;
+        }
+
+        .cabecalho h2 {
+            font-size: 11pt;
+            margin: 0 0 5px 0;
+            font-weight: normal;
+        }
+
+        .cabecalho p {
+            margin: 0;
+            font-size: 9pt;
+            color: #666;
+        }
+
+        .secao {
+            margin-bottom: 20px;
+        }
+
+        .secao-titulo {
+            font-size: 11pt;
+            font-weight: bold;
+            border-bottom: 1px solid #1d4ed8;
+            padding-top: 5px;
+            padding-bottom: 3px;
+            margin-bottom: 10px;
+        }
+
+        /* Tabela estrutural para as duas colunas da ficha */
+        .tabela-layout {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 10px;
+        }
+
+        .tabela-layout td {
+            border: none;
+            padding: 0;
+            vertical-align: top;
+            width: 50%;
+        }
+
+        .ficha-item p {
+            margin: 0 0 6px 0;
+        }
+
+        /* Tabela de dados (Histórico) */
+        .tabela-dados {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 5px;
+        }
+
+        .tabela-dados th {
+            background-color: #1d4ed8;
+            color: white;
+            padding: 6px 8px;
+            text-align: left;
+            font-weight: bold;
+            font-size: 10pt;
+        }
+
+        .tabela-dados td {
+            padding: 6px 8px;
+            border-bottom: 1px solid #ddd;
+            vertical-align: top;
+            font-size: 9.5pt;
+        }
+
+        .linha-par {
+            background-color: #f9fafb;
+        }
+
+        /* Status simplificados */
+        .status {
+            font-weight: bold;
+            font-size: 9pt;
+        }
+        .status-pendente { color: #92400e; }
+        .status-em_andamento { color: #1e40af; }
+        .status-concluido { color: #065f46; }
+
+        #rodape-conteudo {
+            text-align: center;
+            font-size: 9pt;
+            color: #aaa;
+            border-top: 1px solid #ddd;
+            padding-top: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="rodape-conteudo">
+        <table width="100%" style="border: none;">
+            <tr>
+                <td style="border: none; text-align: left; color: #aaa;">
+                    SIAE — IFMG Campus São João Evangelista
+                </td>
+                <td style="border: none; text-align: right; color: #aaa;">
+                    Página <pdf:pagenumber> de <pdf:pagecount>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="cabecalho">
+        <h1>Instituto Federal de Minas Gerais — Campus São João Evangelista</h1>
+        <h2>Sistema Integrado de Assistência Estudantil — Histórico de Atendimentos</h2>
+        <p>Gerado em: {{ data_geracao|date:"d/m/Y" }}</p>
+    </div>
+
+    <div class="secao">
+        <div class="secao-titulo">Ficha Completa — {{ pessoa.nome }}</div>
+        
+        <table class="tabela-layout">
+            <tr>
+                <td>
+                    <div class="ficha-item">
+                        <p><strong>Nome:</strong> {{ pessoa.nome }}</p>
+                        {% if tipo_pessoa == 'Aluno' %}
+                            <p><strong>RA:</strong> {{ pessoa.ra|default:"Não informado" }}</p>
+                            <p><strong>Curso:</strong> {{ pessoa.curso|default:"Não informado" }}</p>
+                            <p><strong>Responsáveis:</strong>
+                                {% for resp in pessoa.responsaveis.all %}
+                                    {{ resp.nome }} ({{ resp.parentesco }}){% if not forloop.last %}, {% endif %}
+                                {% empty %}
+                                    Não informado
+                                {% endfor %}
+                            </p>
+                        {% else %}
+                            <p><strong>SIAPE:</strong> {{ pessoa.siape|default:"Não informado" }}</p>
+                            <p><strong>Cargo:</strong> {{ pessoa.cargo|default:"Não informado" }}</p>
+                        {% endif %}
+                    </div>
+                </td>
+                <td style="padding-left: 15px;">
+                    <div class="ficha-item">
+                        <p><strong>Telefone:</strong> {{ pessoa.telefone|default:"Não informado" }}</p>
+                        <p><strong>E-mail:</strong> {{ pessoa.email|default:"Não informado" }}</p>
+                        <p><strong>Endereço:</strong> {{ pessoa.endereco|default:"Não informado" }}</p>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="secao">
+        <div class="secao-titulo">Histórico de Atendimentos</div>
+        <table class="tabela-dados">
+            <thead>
+                <tr>
+                    <th style="width: 15%;">Data</th>
+                    <th style="width: 65%;">Descrição</th>
+                    <th style="width: 20%;">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for atendimento in atendimentos %}
+                <tr class="{% cycle '' 'linha-par' %}">
+                    <td>{{ atendimento.data_atendimento|date:"d/m/Y" }}</td>
+                    <td>{{ atendimento.descricao }}</td>
+                    <td>
+                        <span class="status status-{{ atendimento.status|lower }}">
+                            {{ atendimento.get_status_display }}
+                        </span>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3" style="text-align:center; color:#999;">
+                        Nenhum atendimento registrado.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</body>
+</html>

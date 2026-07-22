@@ -13,6 +13,7 @@ urlpatterns = [
     path("atendimentos/novo/", views.AtendimentoCreateView.as_view(), name="novo_atendimento"),
     path("atendimentos/<int:pk>/editar/", views.AtendimentoUpdateView.as_view(), name="editar_atendimento"),
     path("atendimentos/<int:pk>/excluir/", views.AtendimentoDeleteView.as_view(), name="excluir_atendimento"),
+    path('<str:tipo>/<int:pk>/historico/pdf/', views.ExportarPDFView.as_view(), name='historico_pdf'),
 
     # Endpoints de busca para autocomplete
     path("atendimentos/buscar/alunos/", views.buscar_alunos, name="buscar_alunos"),
