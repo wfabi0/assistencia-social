@@ -8,7 +8,7 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib import messages
 from .forms import ServidorForm, AlunoForm
-from .models import Endereco, Servidor, Aluno
+from .models import Endereco, Responsavel, Servidor, Aluno
 from .forms import ServidorForm, AlunoForm, UsuarioExternoForm
 from .models import Endereco, Servidor, Aluno, UsuarioExterno
 from django.views.generic.list import MultipleObjectMixin
@@ -46,6 +46,41 @@ def endereco_autocomplete(request):
     results = [{'id': e.pk, 'label': str(e)} for e in enderecos]
     return JsonResponse({'results': results})
 
+# usuarios/views.py
+
+@login_required
+@permission_required('usuarios.view_responsavel', raise_exception=False)
+def responsavel_autocomplete(request):
+    if not request.user.has_perm('usuarios.view_responsavel'):
+        return JsonResponse({'error': 'Sem permissão'}, status=403)
+
+    query = request.GET.get('q', '').strip()
+    if not query:
+        return JsonResponse({'results': []})
+
+    responsaveis = Responsavel.objects.filter(
+        Q(nome__icontains=query) |
+        Q(cpf__icontains=query) |
+        Q(email__icontains=query) |
+        Q(telefone__icontains=query) |
+        Q(parentesco__icontains=query) |
+        Q(endereco__logradouro__icontains=query) |
+        Q(endereco__bairro__icontains=query) |
+        Q(endereco__cidade__icontains=query) |
+        Q(endereco__estado__icontains=query)
+    ).select_related('endereco').order_by('nome')[:10]
+
+    results = []
+    for r in responsaveis:
+        results.append({
+            'id': r.pk,
+            'label': str(r),
+            'cpf': r.cpf,
+            'telefone': r.telefone,
+            'email': r.email,
+            'parentesco': r.parentesco,
+        })
+    return JsonResponse({'results': results})
 
 @login_required
 @permission_required('usuarios.view_aluno', raise_exception=False)

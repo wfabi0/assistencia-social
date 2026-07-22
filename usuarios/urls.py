@@ -19,6 +19,9 @@ urlpatterns = [
 
     path('enderecos/busca/', views.endereco_autocomplete,
          name='endereco_autocomplete'),
+    
+    path('responsavel/busca/', views.responsavel_autocomplete,
+         name='responsavel_autocomplete'),
      
     path('cursos/busca/', views.curso_autocomplete, name='curso_autocomplete'),
 
