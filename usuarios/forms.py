@@ -1,5 +1,7 @@
 import re
 
+from datetime import date, timedelta
+
 from django import forms
 from django.core.exceptions import ValidationError
 
@@ -180,6 +182,29 @@ class ServidorForm(forms.ModelForm):
             'endereco_busca',
             ''
         ).strip()
+        
+    def clean_data_nascimento(self):
+        data = self.cleaned_data.get('data_nascimento')
+        
+        if not data:
+            return data
+        
+        hoje = date.today()
+        
+        if data > hoje:
+            raise ValidationError('Data de nascimento não pode ser no futuro.')
+        
+        idade_maxima = 120
+        data_minima = hoje - timedelta(days=idade_maxima * 365.25)
+        if data < data_minima:
+            raise ValidationError(f'Data de nascimento muito antiga. A idade máxima permitida é {idade_maxima} anos.')
+        
+        idade_minima = 10
+        data_maxima = hoje - timedelta(days=idade_minima * 365.25)
+        if data > data_maxima:
+            raise ValidationError(f'Idade mínima permitida é {idade_minima} anos.')
+        
+        return data
 
     def clean(self):
         cleaned_data = super().clean()
@@ -493,6 +518,29 @@ class AlunoForm(forms.ModelForm):
         if '@' not in email or '.' not in email:
             raise ValidationError('Informe um e-mail válido.')
         return email
+    
+    def clean_data_nascimento(self):
+            data = self.cleaned_data.get('data_nascimento')
+            
+            if not data:
+                return data
+            
+            hoje = date.today()
+            
+            if data > hoje:
+                raise ValidationError('Data de nascimento não pode ser no futuro.')
+            
+            idade_maxima = 120
+            data_minima = hoje - timedelta(days=idade_maxima * 365.25)
+            if data < data_minima:
+                raise ValidationError(f'Data de nascimento muito antiga. A idade máxima permitida é {idade_maxima} anos.')
+            
+            idade_minima = 10
+            data_maxima = hoje - timedelta(days=idade_minima * 365.25)
+            if data > data_maxima:
+                raise ValidationError(f'Idade mínima permitida é {idade_minima} anos.')
+            
+            return data
 
     def clean(self):
         cleaned_data = super().clean()
@@ -711,6 +759,29 @@ class UsuarioExternoForm(forms.ModelForm):
         
     def clean_endereco_busca(self):
         return self.cleaned_data.get('endereco_busca', '').strip()
+    
+    def clean_data_nascimento(self):
+        data = self.cleaned_data.get('data_nascimento')
+        
+        if not data:
+            return data
+        
+        hoje = date.today()
+        
+        if data > hoje:
+            raise ValidationError('Data de nascimento não pode ser no futuro.')
+        
+        idade_maxima = 120
+        data_minima = hoje - timedelta(days=idade_maxima * 365.25)
+        if data < data_minima:
+            raise ValidationError(f'Data de nascimento muito antiga. A idade máxima permitida é {idade_maxima} anos.')
+        
+        idade_minima = 10
+        data_maxima = hoje - timedelta(days=idade_minima * 365.25)
+        if data > data_maxima:
+            raise ValidationError(f'Idade mínima permitida é {idade_minima} anos.')
+        
+        return data
         
     def clean(self):
         cleaned_data = super().clean()
