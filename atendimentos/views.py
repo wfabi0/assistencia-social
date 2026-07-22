@@ -1,8 +1,8 @@
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, ListView, UpdateView, DeleteView
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.db.models import Q
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect, render, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
@@ -10,6 +10,11 @@ from django.contrib import messages
 from .models import Atendimento
 from .forms import AtendimentoForm
 from usuarios.models import Aluno, Servidor, UsuarioExterno
+from django.views import View
+from django.template.loader import render_to_string
+from datetime import date
+from xhtml2pdf import pisa
+from io import BytesIO
 
 # --- MIXIN CUSTOMIZADO ---
 class CustomPermissionMixin(PermissionRequiredMixin):
@@ -79,6 +84,41 @@ class AtendimentoDeleteView(LoginRequiredMixin, CustomPermissionMixin, DeleteVie
     def form_valid(self, form):
         messages.success(self.request, "Atendimento removido com sucesso.")
         return super().form_valid(form)
+
+class ExportarPDFView(LoginRequiredMixin, CustomPermissionMixin, View):
+    permission_required = 'usuarios.view_aluno'
+
+    def get(self, request, tipo, pk):
+        if tipo == 'aluno':
+            pessoa = get_object_or_404(Aluno.objects.prefetch_related('responsaveis'), pk=pk)
+            atendimentos = Atendimento.objects.filter(aluno=pessoa).order_by('-data_atendimento')
+            tipo_pessoa = 'Aluno'
+            filename = f'historico_{pessoa.ra}.pdf'
+        elif tipo == 'servidor':
+            pessoa = get_object_or_404(Servidor, pk=pk)
+            atendimentos = Atendimento.objects.filter(servidor=pessoa).order_by('-data_atendimento')
+            tipo_pessoa = 'Servidor'
+            filename = f'historico_{pessoa.siape}.pdf'
+        else:
+            from django.http import Http404
+            raise Http404
+
+        html_string = render_to_string('atendimentos/historico_pdf.html', {
+            'pessoa': pessoa,
+            'tipo_pessoa': tipo_pessoa,
+            'atendimentos': atendimentos,
+            'data_geracao': date.today(),
+        })
+
+        buffer = BytesIO()
+        pisa.CreatePDF(html_string.encode('utf-8'), dest=buffer, encoding='utf-8')
+        pdf = buffer.getvalue()
+        buffer.close()
+
+        response = HttpResponse(pdf, content_type='application/pdf')
+        response['Content-Disposition'] = f'inline; filename="{filename}"'
+        
+        return response
 
 # --- BUSCAS VIA AJAX ---
 
