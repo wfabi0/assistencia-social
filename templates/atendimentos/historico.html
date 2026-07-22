@@ -2,18 +2,6 @@
 
 {% block content %}
 <div class="container mt-4">
-    
-    <nav aria-label="breadcrumb" class="mb-4">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{% url 'home' %}">Principal</a></li>
-            {% if tipo_pessoa == 'Aluno' %}
-                <li class="breadcrumb-item"><a href="{% url 'aluno_list' %}">Lista de Alunos</a></li>
-            {% else %}
-                <li class="breadcrumb-item"><a href="{% url 'servidor_list' %}">Lista de Servidores</a></li>
-            {% endif %}
-            <li class="breadcrumb-item active" aria-current="page">Registro de Atendimento</li>
-        </ol>
-    </nav>
 
    <div class="card mb-4">
         <div class="card-header bg-light">
