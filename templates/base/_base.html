@@ -33,57 +33,72 @@
         <div class="collapse navbar-collapse" id="navbarNav">
 
             <!-- Menu Principal -->
-            <ul class="navbar-nav me-auto ms-3">
 
-                <!-- Usuários (Dropdown) -->
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle fw-semibold px-3 py-2 rounded-3 text-white" 
-                       href="#" role="button" data-bs-toggle="dropdown"
-                       style="transition: all 0.3s ease;"
-                       onmouseenter="this.style.background='rgba(255,255,255,0.15)'" 
-                       onmouseleave="this.style.background='transparent'">
-                        <i class="bi bi-people-fill me-1"></i> Usuários
-                    </a>
-                    <ul class="dropdown-menu border-0 shadow-lg rounded-3 mt-2" 
-                        style="background-color: #0d47a1;">
-                        <li>
-                            <a class="dropdown-item py-2 px-4 rounded-2 text-white" href="{% url 'aluno_list' %}" 
-                               style="transition: all 0.2s ease; background-color: transparent;"
-                               onmouseenter="this.style.background='rgba(255,255,255,0.15)'" 
-                               onmouseleave="this.style.background='transparent'">
-                                <i class="bi bi-person-graduate me-2"></i> Alunos
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item py-2 px-4 rounded-2 text-white" href="{% url 'servidor_list' %}"
-                               style="transition: all 0.2s ease; background-color: transparent;"
-                               onmouseenter="this.style.background='rgba(255,255,255,0.15)'" 
-                               onmouseleave="this.style.background='transparent'">
-                                <i class="bi bi-person-badge me-2"></i> Servidores
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item py-2 px-4 rounded-2 text-white" href="{% url 'usuario_externo_list' %}"
-                               style="transition: all 0.2s ease; background-color: transparent;"
-                               onmouseenter="this.style.background='rgba(255,255,255,0.15)'" 
-                               onmouseleave="this.style.background='transparent'">
-                                <i class="bi bi-person-plus me-2"></i> Usuários Externos
-                            </a>
-                        </li>
-                    </ul>
-                </li>
+<ul class="navbar-nav me-auto ms-3">
 
-                <!-- Atendimentos -->
-                <li class="nav-item">
-                    <a class="nav-link fw-semibold px-3 py-2 rounded-3 text-white" href="{% url 'lista_atendimentos' %}"
-                       style="transition: all 0.3s ease;"
-                       onmouseenter="this.style.background='rgba(255,255,255,0.15)'" 
-                       onmouseleave="this.style.background='transparent'">
-                        <i class="bi bi-chat-dots-fill me-1"></i> Atendimentos
-                    </a>
-                </li>
+    <!-- Usuários (Dropdown) -->
+    {% if perms.usuarios.view_aluno or perms.usuarios.view_servidor or perms.usuarios.view_usuarioexterno %}
+    <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle fw-semibold px-3 py-2 rounded-3 text-white" 
+           href="#" role="button" data-bs-toggle="dropdown"
+           style="transition: all 0.3s ease;"
+           onmouseenter="this.style.background='rgba(255,255,255,0.15)'" 
+           onmouseleave="this.style.background='transparent'">
+            <i class="bi bi-people-fill me-1"></i> Usuários
+        </a>
+        <ul class="dropdown-menu border-0 shadow-lg rounded-3 mt-2" 
+            style="background-color: #0d47a1;">
+            
+            {% if perms.usuarios.view_aluno %}
+            <li>
+                <a class="dropdown-item py-2 px-4 rounded-2 text-white" href="{% url 'aluno_list' %}" 
+                   style="transition: all 0.2s ease; background-color: transparent;"
+                   onmouseenter="this.style.background='rgba(255,255,255,0.15)'" 
+                   onmouseleave="this.style.background='transparent'">
+                    <i class="bi bi-person-graduate me-2"></i> Alunos
+                </a>
+            </li>
+            {% endif %}
+            
+            {% if perms.usuarios.view_servidor %}
+            <li>
+                <a class="dropdown-item py-2 px-4 rounded-2 text-white" href="{% url 'servidor_list' %}"
+                   style="transition: all 0.2s ease; background-color: transparent;"
+                   onmouseenter="this.style.background='rgba(255,255,255,0.15)'" 
+                   onmouseleave="this.style.background='transparent'">
+                    <i class="bi bi-person-badge me-2"></i> Servidores
+                </a>
+            </li>
+            {% endif %}
+            
+            {% if perms.usuarios.view_usuarioexterno %}
+            <li>
+                <a class="dropdown-item py-2 px-4 rounded-2 text-white" href="{% url 'usuario_externo_list' %}"
+                   style="transition: all 0.2s ease; background-color: transparent;"
+                   onmouseenter="this.style.background='rgba(255,255,255,0.15)'" 
+                   onmouseleave="this.style.background='transparent'">
+                    <i class="bi bi-person-plus me-2"></i> Usuários Externos
+                </a>
+            </li>
+            {% endif %}
+            
+        </ul>
+    </li>
+    {% endif %}
 
-            </ul>
+    <!-- Atendimentos -->
+    {% if perms.atendimentos.view_atendimento %}
+    <li class="nav-item">
+        <a class="nav-link fw-semibold px-3 py-2 rounded-3 text-white" href="{% url 'lista_atendimentos' %}"
+           style="transition: all 0.3s ease;"
+           onmouseenter="this.style.background='rgba(255,255,255,0.15)'" 
+           onmouseleave="this.style.background='transparent'">
+            <i class="bi bi-chat-dots-fill me-1"></i> Atendimentos
+        </a>
+    </li>
+    {% endif %}
+
+</ul>
 
             <!-- Usuário Logado -->
             {% if user.is_authenticated %}
