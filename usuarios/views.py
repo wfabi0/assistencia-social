@@ -143,6 +143,7 @@ class AlunoCreateView(LoginRequiredMixin, CustomPermissionMixin, CreateView):
     success_url = reverse_lazy('aluno_list')
     
     def form_valid(self, form):
+        form.instance.criado_por = self.request.user
         messages.success(self.request, 'Aluno cadastrado com sucesso!')
         return super().form_valid(form)
 
@@ -154,6 +155,7 @@ class AlunoUpdateView(LoginRequiredMixin, CustomPermissionMixin, UpdateView):
     success_url = reverse_lazy('aluno_list')
     
     def form_valid(self, form):
+        form.instance.criado_por = self.request.user
         messages.success(self.request, 'Aluno atualizado com sucesso!')
         return super().form_valid(form)
 
@@ -233,6 +235,7 @@ class ServidorCreateView(LoginRequiredMixin, CustomPermissionMixin, CreateView):
     success_url = reverse_lazy('servidor_list')
     
     def form_valid(self, form):
+        form.instance.criado_por = self.request.user
         messages.success(self.request, "Servidor cadastrado com sucesso!")
         return super().form_valid(form)
 
@@ -244,6 +247,7 @@ class ServidorUpdateView(LoginRequiredMixin, CustomPermissionMixin, UpdateView):
     success_url = reverse_lazy('servidor_list')
     
     def form_valid(self, form):
+        form.instance.criado_por = self.request.user
         messages.success(self.request, 'Servidor atualizado com sucesso!')
         return super().form_valid(form)
 
@@ -322,6 +326,7 @@ class UsuarioExternoCreateView(LoginRequiredMixin, CustomPermissionMixin, Create
     success_url = reverse_lazy('usuario_externo_list')
     
     def form_valid(self, form):
+        form.instance.criado_por = self.request.user
         messages.success(self.request, 'Usuário Externo cadastrado com sucesso!')
         return super().form_valid(form)
     
@@ -333,6 +338,7 @@ class UsuarioExternoUpdateView(LoginRequiredMixin, CustomPermissionMixin, Update
     success_url = reverse_lazy('usuario_externo_list')
     
     def form_valid(self, form):
+        form.instance.criado_por = self.request.user
         messages.success(self.request, 'Usuário Externo atualizado com sucesso!')
         return super().form_valid(form)
 

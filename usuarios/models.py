@@ -42,6 +42,13 @@ class Aluno(models.Model):
     telefone = models.CharField("Telefone", max_length=20, blank=True, null=True)
     endereco = models.ForeignKey(Endereco, on_delete=models.SET_NULL, null=True, blank=True, related_name="alunos")
     data_nascimento = models.DateField("Data de Nascimento")
+    criado_por = models.ForeignKey(
+        Usuario,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='alunos_criados'
+    )
     
     class Meta:
         verbose_name = "Aluno"
@@ -76,6 +83,14 @@ class Servidor(models.Model):
     email = models.EmailField("Email", max_length=255, blank=True, null=True)
     telefone = models.CharField("Telefone", max_length=20, blank=True, null=True)
     endereco = models.ForeignKey(Endereco, on_delete=models.SET_NULL, null=True, blank=True, related_name="servidores")
+
+    criado_por = models.ForeignKey(
+        Usuario,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='servidores_criados'   
+    )
     
     class Meta:
         verbose_name = "Servidor"
@@ -93,6 +108,13 @@ class UsuarioExterno(models.Model):
     email = models.EmailField("Email", max_length=255, blank=True, null=True)
     telefone = models.CharField("Telefone", max_length=20, blank=True, null=True)
     endereco = models.ForeignKey(Endereco, on_delete=models.SET_NULL, null=True, blank=True, related_name="usuarios_externos")
+    criado_por = models.ForeignKey(
+        Usuario,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='usuarios_externos_criados' 
+    )
     
     class Meta:
         verbose_name = "Usuário Externo"

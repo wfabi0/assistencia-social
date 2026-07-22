@@ -61,6 +61,7 @@ class AtendimentoCreateView(LoginRequiredMixin, CustomPermissionMixin, CreateVie
     success_url = reverse_lazy("lista_atendimentos")
     
     def form_valid(self, form):
+        form.instance.criado_por = self.request.user
         messages.success(self.request, "Atendimento registrado com sucesso.")
         return super().form_valid(form)
 

@@ -159,10 +159,24 @@
                                 {% empty %}
                                     Não informado
                                 {% endfor %}
+                                <p><strong>Assistente Social Responsável:</strong>
+                                    {% if pessoa.criado_por %}
+                                        {{ pessoa.criado_por.get_full_name|default:pessoa.criado_por.username }}
+                                    {% else %}
+                                        Não informado
+                                    {% endif %}
+                                </p>
                             </p>
                         {% else %}
                             <p><strong>SIAPE:</strong> {{ pessoa.siape|default:"Não informado" }}</p>
                             <p><strong>Cargo:</strong> {{ pessoa.cargo|default:"Não informado" }}</p>
+                            <p><strong>Assistente Social Responsável:</strong>
+                                {% if pessoa.criado_por %}
+                                    {{ pessoa.criado_por.get_full_name|default:pessoa.criado_por.username }}
+                                {% else %}
+                                    Não informado
+                                {% endif %}
+                            </p>
                         {% endif %}
                     </div>
                 </td>

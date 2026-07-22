@@ -12,7 +12,8 @@ class AtendimentoForm(forms.ModelForm):
             'tipo_pessoa', 
             'aluno',
             'servidor',
-            'usuario_externo']
+            'usuario_externo'
+        ]
         widgets = {
             "data_atendimento": forms.DateInput(attrs={"class": "datepicker"}),
             "tipo_pessoa": forms.RadioSelect(),
@@ -27,8 +28,6 @@ class AtendimentoForm(forms.ModelForm):
                 (k, v) for k, v in self.fields['tipo_pessoa'].choices if k
             ]
 
-            # 2. Define um rádio pré-selecionado por padrão se for um formulário NOVO
-            # (Se for uma edição, ele mantém o valor que já estava salvo no banco)
             if not self.instance.pk:
                 self.fields['tipo_pessoa'].initial = 'ALU'  # 'ALU' para Aluno, 'SER' para Servidor, etc.
 

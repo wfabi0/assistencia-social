@@ -33,8 +33,20 @@
                 <div class="col-md-6">
                     <p><strong>Telefone:</strong> {{ pessoa.telefone|default:"Não informado" }}</p>
                     <p><strong>E-mail:</strong> {{ pessoa.email|default:"Não informado" }}</p>
-                    <p><strong>Assistente Social Responsável:</strong> - </p>
-                    <p><strong>CRESS:</strong> - </p>
+                    <p><strong>Assistente Social Responsável:</strong>
+                        {% if pessoa.criado_por %}
+                            {{ pessoa.criado_por.get_full_name|default:pessoa.criado_por.username }}
+                        {% else %}
+                            Não informado
+                        {% endif %}
+                    </p>
+                    <p><strong>CRESS:</strong>
+                        {% if pessoa.criado_por and pessoa.criado_por.cress %}
+                            {{ pessoa.criado_por.cress }}
+                        {% else %}
+                            Não informado
+                        {% endif %}
+                    </p>
                 </div>
             </div>
         </div>
