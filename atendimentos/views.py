@@ -16,7 +16,6 @@ from datetime import date
 from xhtml2pdf import pisa
 from io import BytesIO
 
-# --- MIXIN CUSTOMIZADO ---
 class CustomPermissionMixin(PermissionRequiredMixin):
     """
     Mixin que redireciona para a home com uma mensagem de erro 
@@ -26,7 +25,6 @@ class CustomPermissionMixin(PermissionRequiredMixin):
         messages.error(self.request, "Você não tem permissão para acessar esta área.")
         return redirect('home')
 
-# --- VIEWS DE ATENDIMENTO ---
 
 class AtendimentoListView(LoginRequiredMixin, CustomPermissionMixin, ListView):
     permission_required = "atendimentos.view_atendimento"
@@ -35,7 +33,12 @@ class AtendimentoListView(LoginRequiredMixin, CustomPermissionMixin, ListView):
     context_object_name = "atendimentos"
     
     def get_paginate_by(self, queryset):
-        return self.request.GET.get("por_pagina", 10)
+        opcoes = {5, 10, 25, 50}
+        try:
+            valor = int(self.request.GET.get("por_pagina", 10))
+        except (TypeError, ValueError):
+            return 10
+        return valor if valor in opcoes else 10
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -87,7 +90,7 @@ class AtendimentoDeleteView(LoginRequiredMixin, CustomPermissionMixin, DeleteVie
         return super().form_valid(form)
 
 class ExportarPDFView(LoginRequiredMixin, CustomPermissionMixin, View):
-    permission_required = []  # Lista vazia como padrão
+    permission_required = "atendimentos.view_atendimento"
 
     def get_permission_required(self):
         tipo = self.kwargs.get('tipo')
@@ -97,7 +100,7 @@ class ExportarPDFView(LoginRequiredMixin, CustomPermissionMixin, View):
             return ['usuarios.view_servidor']
         elif tipo == 'usuarioexterno':
             return ['usuarios.view_usuarioexterno']
-        return ['usuarios.view_aluno']  # fallback
+        return ['usuarios.view_aluno']
 
     def get(self, request, tipo, pk):
         if tipo == 'aluno':

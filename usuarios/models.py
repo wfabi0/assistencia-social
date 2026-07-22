@@ -17,7 +17,6 @@ cpf_validator = RegexValidator(
     message="CPF deve estar no formato 000.000.000-00"
 )
 
-# Create your models here.
 class Endereco(models.Model):
     logradouro = models.CharField("Logradouro", max_length=255)
     numero = models.CharField("Número", max_length=10)
