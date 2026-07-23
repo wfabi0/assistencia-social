@@ -150,20 +150,36 @@
                 <td>
                     <div class="ficha-item">
                         <p><strong>Nome:</strong> {{ pessoa.nome }}</p>
+
                         {% if tipo_pessoa == 'Aluno' %}
                             <p><strong>RA:</strong> {{ pessoa.ra|default:"Não informado" }}</p>
                             <p><strong>Curso:</strong> {{ pessoa.curso|default:"Não informado" }}</p>
-                            <p><strong>Responsáveis:</strong>
+                            <p>
+                                <strong>Responsáveis:</strong>
                                 {% for resp in pessoa.responsaveis.all %}
                                     {{ resp.nome }} ({{ resp.parentesco }}){% if not forloop.last %}, {% endif %}
                                 {% empty %}
                                     Não informado
                                 {% endfor %}
                             </p>
-                        {% else %}
+
+                        {% elif tipo_pessoa == 'Servidor' %}
                             <p><strong>SIAPE:</strong> {{ pessoa.siape|default:"Não informado" }}</p>
                             <p><strong>Cargo:</strong> {{ pessoa.cargo|default:"Não informado" }}</p>
+
+                        {% elif tipo_pessoa == 'UsuarioExterno' %}
+                            <p><strong>CPF:</strong> {{ pessoa.cpf|default:"Não informado" }}</p>
+                            <p><strong>Data de Nascimento:</strong> {{ pessoa.data_nascimento|date:"d/m/Y"|default:"Não informado" }}</p>
                         {% endif %}
+
+                        <p>
+                            <strong>Assistente Social Responsável:</strong>
+                            {% if pessoa.criado_por %}
+                                {{ pessoa.criado_por.get_full_name|default:pessoa.criado_por.username }}
+                            {% else %}
+                                Não informado
+                            {% endif %}
+                        </p>
                     </div>
                 </td>
                 <td style="padding-left: 15px;">

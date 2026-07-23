@@ -1,6 +1,6 @@
 from django.db import models
 from django.core.exceptions import ValidationError
-from usuarios.models import Aluno, Servidor, UsuarioExterno
+from usuarios.models import Aluno, Servidor, UsuarioExterno, Usuario
 
 # Create your models here.
 class Atendimento(models.Model):
@@ -48,6 +48,14 @@ class Atendimento(models.Model):
     )
     criado_em = models.DateTimeField(auto_now_add=True)
     atualizado_em = models.DateTimeField(auto_now=True)
+    criado_por = models.ForeignKey(
+        Usuario,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="atendimentos_criados",
+        verbose_name="Criado por"
+    )
     
     class Meta:
         verbose_name = "Atendimento"

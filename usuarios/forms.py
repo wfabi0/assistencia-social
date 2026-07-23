@@ -1,9 +1,11 @@
 import re
 
+from datetime import date, timedelta
+
 from django import forms
 from django.core.exceptions import ValidationError
 
-from .models import Endereco, Servidor, Aluno, UsuarioExterno
+from .models import Endereco, Servidor, Aluno, UsuarioExterno, Responsavel
 
 
 ENDERECO_PATTERN = re.compile(
@@ -180,6 +182,29 @@ class ServidorForm(forms.ModelForm):
             'endereco_busca',
             ''
         ).strip()
+        
+    def clean_data_nascimento(self):
+        data = self.cleaned_data.get('data_nascimento')
+        
+        if not data:
+            return data
+        
+        hoje = date.today()
+        
+        if data > hoje:
+            raise ValidationError('Data de nascimento não pode ser no futuro.')
+        
+        idade_maxima = 120
+        data_minima = hoje - timedelta(days=idade_maxima * 365.25)
+        if data < data_minima:
+            raise ValidationError(f'Data de nascimento muito antiga. A idade máxima permitida é {idade_maxima} anos.')
+        
+        idade_minima = 10
+        data_maxima = hoje - timedelta(days=idade_minima * 365.25)
+        if data > data_maxima:
+            raise ValidationError(f'Idade mínima permitida é {idade_minima} anos.')
+        
+        return data
 
     def clean(self):
         cleaned_data = super().clean()
@@ -280,6 +305,69 @@ class AlunoForm(forms.ModelForm):
         widget=forms.HiddenInput()
     )
 
+    responsavel_id = forms.IntegerField(
+        required=False,
+        widget=forms.HiddenInput()
+    )
+
+    responsavel_nome = forms.CharField(
+        label='Nome do Responsável',
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Nome completo do responsável'
+        })
+    )
+
+    responsavel_cpf = forms.CharField(
+        label='CPF do Responsável',
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control cpf-mask',
+            'placeholder': '000.000.000-00',
+            'maxlength': '14'
+        })
+    )
+
+    responsavel_telefone = forms.CharField(
+        label='Telefone do Responsável',
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control telefone-mask',
+            'placeholder': '(00) 00000-0000',
+            'maxlength': '15'
+        })
+    )
+
+    responsavel_email = forms.EmailField(
+        label='E-mail do Responsável',
+        required=False,
+        widget=forms.EmailInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'email@exemplo.com'
+        })
+    )
+
+    responsavel_parentesco = forms.ChoiceField(
+        label='Parentesco',
+        required=False,
+        choices=[
+            ('', 'Selecione o parentesco'),
+            ('Pai', 'Pai'),
+            ('Mãe', 'Mãe'),
+            ('Filho', 'Filho(a)'),
+            ('Irmão', 'Irmão(ã)'),
+            ('Avô', 'Avô(ó)'),
+            ('Tio', 'Tio(a)'),
+            ('Primo', 'Primo(a)'),
+            ('Cônjuge', 'Cônjuge'),
+            ('Outro', 'Outro'),
+        ],
+        widget=forms.Select(attrs={
+            'class': 'form-select'
+        })
+    )
+
     class Meta:
         model = Aluno
         fields = [
@@ -333,7 +421,17 @@ class AlunoForm(forms.ModelForm):
         if endereco:
             self.fields['endereco_busca'].initial = str(endereco)
             self.fields['endereco_id'].initial = endereco.pk
-        
+
+        if self.instance.pk:
+            responsavel = self.instance.responsaveis.first()
+            if responsavel:
+                self.fields['responsavel_id'].initial = responsavel.pk
+                self.fields['responsavel_nome'].initial = responsavel.nome
+                self.fields['responsavel_cpf'].initial = responsavel.cpf
+                self.fields['responsavel_telefone'].initial = responsavel.telefone
+                self.fields['responsavel_email'].initial = responsavel.email
+                self.fields['responsavel_parentesco'].initial = responsavel.parentesco
+
         if self.is_bound:
             for field_name in self.errors:
                 if field_name in self.fields:
@@ -341,20 +439,15 @@ class AlunoForm(forms.ModelForm):
                     attrs['class'] = attrs.get('class', '') + ' is-invalid'
 
     def _parse_endereco_texto(self, endereco_texto):
-        
         match = ENDERECO_PATTERN.match(endereco_texto)
-
         if not match:
             return None
-
         dados = {
             chave: valor.strip()
             for chave, valor in match.groupdict().items()
         }
-
         if not all(dados.values()):
             return None
-
         return dados
 
     def clean_ra(self):
@@ -373,29 +466,81 @@ class AlunoForm(forms.ModelForm):
         telefone = self.cleaned_data.get('telefone')
         if not telefone:
             return telefone
-
         numeros = re.sub(r'\D', '', telefone)
-
         if numeros.startswith('55') and len(numeros) > 11:
             numeros = numeros[2:]
-
         tamanho = len(numeros)
-
         if tamanho == 0:
             return ''
-
         if tamanho not in (10, 11):
             raise ValidationError('Informe um telefone valido com DDD (ex: 31 99999-9999).')
-
         if tamanho == 11:
             telefone_formatado = f"({numeros[:2]}) {numeros[2:7]}-{numeros[7:]}"
         else:
             telefone_formatado = f"({numeros[:2]}) {numeros[2:6]}-{numeros[6:]}"
-
         return telefone_formatado
 
     def clean_endereco_busca(self):
         return self.cleaned_data.get('endereco_busca', '').strip()
+
+    def clean_responsavel_cpf(self):
+        cpf = self.cleaned_data.get('responsavel_cpf', '').strip()
+        if not cpf:
+            return ''
+        cpf_numeros = re.sub(r'\D', '', cpf)
+        if len(cpf_numeros) != 11:
+            raise ValidationError('CPF deve ter 11 dígitos.')
+        cpf_formatado = f"{cpf_numeros[:3]}.{cpf_numeros[3:6]}.{cpf_numeros[6:9]}-{cpf_numeros[9:]}"
+        return cpf_formatado
+
+    def clean_responsavel_telefone(self):
+        telefone = self.cleaned_data.get('responsavel_telefone', '').strip()
+        if not telefone:
+            return ''
+        numeros = re.sub(r'\D', '', telefone)
+        if numeros.startswith('55') and len(numeros) > 11:
+            numeros = numeros[2:]
+        tamanho = len(numeros)
+        if tamanho == 0:
+            return ''
+        if tamanho not in (10, 11):
+            raise ValidationError('Informe um telefone válido com DDD (ex: 31 99999-9999).')
+        if tamanho == 11:
+            telefone_formatado = f"({numeros[:2]}) {numeros[2:7]}-{numeros[7:]}"
+        else:
+            telefone_formatado = f"({numeros[:2]}) {numeros[2:6]}-{numeros[6:]}"
+        return telefone_formatado
+
+    def clean_responsavel_email(self):
+        email = self.cleaned_data.get('responsavel_email', '').strip()
+        if not email:
+            return ''
+        if '@' not in email or '.' not in email:
+            raise ValidationError('Informe um e-mail válido.')
+        return email
+    
+    def clean_data_nascimento(self):
+            data = self.cleaned_data.get('data_nascimento')
+            
+            if not data:
+                return data
+            
+            hoje = date.today()
+            
+            if data > hoje:
+                raise ValidationError('Data de nascimento não pode ser no futuro.')
+            
+            idade_maxima = 120
+            data_minima = hoje - timedelta(days=idade_maxima * 365.25)
+            if data < data_minima:
+                raise ValidationError(f'Data de nascimento muito antiga. A idade máxima permitida é {idade_maxima} anos.')
+            
+            idade_minima = 10
+            data_maxima = hoje - timedelta(days=idade_minima * 365.25)
+            if data > data_maxima:
+                raise ValidationError(f'Idade mínima permitida é {idade_minima} anos.')
+            
+            return data
 
     def clean(self):
         cleaned_data = super().clean()
@@ -414,22 +559,40 @@ class AlunoForm(forms.ModelForm):
                     'Selecione um endereço existente da lista ou deixe o campo vazio para cadastrar um novo.'
                 )
                 return cleaned_data
-
             self._endereco_resolvido = endereco
-            return cleaned_data
+        elif endereco_busca:
+            endereco_dados = self._parse_endereco_texto(endereco_busca)
+            if endereco_dados is None:
+                self.add_error(
+                    'endereco_busca',
+                    'Digite o endereço no formato "Rua, número - bairro, cidade - estado, CEP: 00000-000" ou selecione uma opção da lista.'
+                )
+                return cleaned_data
+            self._novo_endereco_dados = endereco_dados
 
-        if not endereco_busca:
-            return cleaned_data
+        responsavel_id = cleaned_data.get('responsavel_id')
+        responsavel_nome = cleaned_data.get('responsavel_nome', '').strip()
+        responsavel_cpf = cleaned_data.get('responsavel_cpf', '').strip()
+        responsavel_telefone = cleaned_data.get('responsavel_telefone', '').strip()
+        responsavel_parentesco = cleaned_data.get('responsavel_parentesco', '')
 
-        endereco_dados = self._parse_endereco_texto(endereco_busca)
-        if endereco_dados is None:
-            self.add_error(
-                'endereco_busca',
-                'Digite o endereço no formato "Rua, número - bairro, cidade - estado, CEP: 00000-000" ou selecione uma opção da lista.'
-            )
-            return cleaned_data
+        self._responsavel_resolvido = None
 
-        self._novo_endereco_dados = endereco_dados
+        if responsavel_id:
+            responsavel = Responsavel.objects.filter(pk=responsavel_id).first()
+            if responsavel is None:
+                self.add_error('responsavel_nome', 'Responsável selecionado não existe mais.')
+            else:
+                self._responsavel_resolvido = responsavel
+
+        if responsavel_nome:
+            if not responsavel_cpf:
+                self.add_error('responsavel_cpf', 'O CPF é obrigatório quando o nome do responsável é preenchido.')
+            if not responsavel_telefone:
+                self.add_error('responsavel_telefone', 'O telefone é obrigatório quando o nome do responsável é preenchido.')
+            if not responsavel_parentesco:
+                self.add_error('responsavel_parentesco', 'O parentesco é obrigatório quando o nome do responsável é preenchido.')
+
         return cleaned_data
 
     def save(self, commit=True):
@@ -445,6 +608,41 @@ class AlunoForm(forms.ModelForm):
 
         if commit:
             aluno.save()
+
+            self.instance.responsaveis.all().delete()
+
+            responsavel_id = self.cleaned_data.get('responsavel_id')
+            responsavel_nome = self.cleaned_data.get('responsavel_nome', '').strip()
+
+            if responsavel_nome:
+                if responsavel_id:
+                    try:
+                        responsavel = Responsavel.objects.get(pk=responsavel_id)
+                        responsavel.nome = responsavel_nome
+                        responsavel.cpf = self.cleaned_data.get('responsavel_cpf', '').strip()
+                        responsavel.telefone = self.cleaned_data.get('responsavel_telefone', '').strip()
+                        responsavel.email = self.cleaned_data.get('responsavel_email', '').strip()
+                        responsavel.parentesco = self.cleaned_data.get('responsavel_parentesco', '')
+                        responsavel.aluno = aluno
+                        responsavel.save()
+                    except Responsavel.DoesNotExist:
+                        Responsavel.objects.create(
+                            aluno=aluno,
+                            nome=responsavel_nome,
+                            cpf=self.cleaned_data.get('responsavel_cpf', '').strip(),
+                            telefone=self.cleaned_data.get('responsavel_telefone', '').strip(),
+                            email=self.cleaned_data.get('responsavel_email', '').strip(),
+                            parentesco=self.cleaned_data.get('responsavel_parentesco', '')
+                        )
+                else:
+                    Responsavel.objects.create(
+                        aluno=aluno,
+                        nome=responsavel_nome,
+                        cpf=self.cleaned_data.get('responsavel_cpf', '').strip(),
+                        telefone=self.cleaned_data.get('responsavel_telefone', '').strip(),
+                        email=self.cleaned_data.get('responsavel_email', '').strip(),
+                        parentesco=self.cleaned_data.get('responsavel_parentesco', '')
+                    )
 
         return aluno
 
@@ -561,6 +759,29 @@ class UsuarioExternoForm(forms.ModelForm):
         
     def clean_endereco_busca(self):
         return self.cleaned_data.get('endereco_busca', '').strip()
+    
+    def clean_data_nascimento(self):
+        data = self.cleaned_data.get('data_nascimento')
+        
+        if not data:
+            return data
+        
+        hoje = date.today()
+        
+        if data > hoje:
+            raise ValidationError('Data de nascimento não pode ser no futuro.')
+        
+        idade_maxima = 120
+        data_minima = hoje - timedelta(days=idade_maxima * 365.25)
+        if data < data_minima:
+            raise ValidationError(f'Data de nascimento muito antiga. A idade máxima permitida é {idade_maxima} anos.')
+        
+        idade_minima = 10
+        data_maxima = hoje - timedelta(days=idade_minima * 365.25)
+        if data > data_maxima:
+            raise ValidationError(f'Idade mínima permitida é {idade_minima} anos.')
+        
+        return data
         
     def clean(self):
         cleaned_data = super().clean()

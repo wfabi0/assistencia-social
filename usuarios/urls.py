@@ -19,6 +19,9 @@ urlpatterns = [
 
     path('enderecos/busca/', views.endereco_autocomplete,
          name='endereco_autocomplete'),
+    
+    path('responsavel/busca/', views.responsavel_autocomplete,
+         name='responsavel_autocomplete'),
      
     path('cursos/busca/', views.curso_autocomplete, name='curso_autocomplete'),
 
@@ -53,4 +56,5 @@ urlpatterns = [
     path('usuarios-externos/<int:pk>/editar/', views.UsuarioExternoUpdateView.as_view(), name='usuario_externo_update'),
     path('usuarios-externos/<int:pk>/excluir/', views.UsuarioExternoDeleteView.as_view(), name='usuario_externo_delete'),
     path('usuarios-externos/<int:pk>/detail/', views.UsuarioExternoDetailView.as_view(), name='usuario_externo_detail'),
+    path('usuarios-externos/<int:pk>/historico/', views.HistoricoUsuarioExternoView.as_view(), name='usuario_externo_historico')
 ]

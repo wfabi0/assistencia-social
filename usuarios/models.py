@@ -17,7 +17,6 @@ cpf_validator = RegexValidator(
     message="CPF deve estar no formato 000.000.000-00"
 )
 
-# Create your models here.
 class Endereco(models.Model):
     logradouro = models.CharField("Logradouro", max_length=255)
     numero = models.CharField("Número", max_length=10)
@@ -42,6 +41,13 @@ class Aluno(models.Model):
     telefone = models.CharField("Telefone", max_length=20, blank=True, null=True)
     endereco = models.ForeignKey(Endereco, on_delete=models.SET_NULL, null=True, blank=True, related_name="alunos")
     data_nascimento = models.DateField("Data de Nascimento")
+    criado_por = models.ForeignKey(
+        Usuario,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='alunos_criados'
+    )
     
     class Meta:
         verbose_name = "Aluno"
@@ -76,6 +82,14 @@ class Servidor(models.Model):
     email = models.EmailField("Email", max_length=255, blank=True, null=True)
     telefone = models.CharField("Telefone", max_length=20, blank=True, null=True)
     endereco = models.ForeignKey(Endereco, on_delete=models.SET_NULL, null=True, blank=True, related_name="servidores")
+
+    criado_por = models.ForeignKey(
+        Usuario,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='servidores_criados'   
+    )
     
     class Meta:
         verbose_name = "Servidor"
@@ -93,6 +107,13 @@ class UsuarioExterno(models.Model):
     email = models.EmailField("Email", max_length=255, blank=True, null=True)
     telefone = models.CharField("Telefone", max_length=20, blank=True, null=True)
     endereco = models.ForeignKey(Endereco, on_delete=models.SET_NULL, null=True, blank=True, related_name="usuarios_externos")
+    criado_por = models.ForeignKey(
+        Usuario,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='usuarios_externos_criados' 
+    )
     
     class Meta:
         verbose_name = "Usuário Externo"

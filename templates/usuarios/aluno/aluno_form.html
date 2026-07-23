@@ -5,36 +5,89 @@
 {% endblock %}
 
 {% block campos_form %}
+    <h5 class="border-bottom pb-2 mb-3">
+        <i class="bi bi-person me-2 text-primary"></i> Dados do Aluno
+    </h5>
+
     <div class="row">
         {% for field in form %}
-            {% if field.name != 'endereco_id' %}
-            <div class="{% if field.name == 'endereco_busca' %}col-md-12{% else %}col-md-6{% endif %} mb-3">
-                <label class="form-label fw-bold">{{ field.label }}</label>
-                
-                {% if field.name == 'endereco_busca' %}
-                    <!-- Autocomplete para Endereço -->
-                    <div class="position-relative autocomplete-wrapper">
+            {% if field.name != 'endereco_id' and field.name != 'responsavel_id' and field.name != 'responsavel_nome' and field.name != 'responsavel_cpf' and field.name != 'responsavel_telefone' and field.name != 'responsavel_email' and field.name != 'responsavel_parentesco' %}
+                <div class="{% if field.name == 'endereco_busca' %}col-md-12{% else %}col-md-6{% endif %} mb-3">
+                    <label class="form-label fw-bold">{{ field.label }}</label>
+                    
+                    {% if field.name == 'endereco_busca' %}
+                        <div class="position-relative autocomplete-wrapper">
+                            {{ field }}
+                            {{ form.endereco_id }}
+                            <div id="endereco-sugestoes" class="list-group position-absolute w-100 autocomplete-results" style="z-index: 1000; max-height: 200px; overflow-y: auto;"></div>
+                        </div>
+                    {% elif field.name == 'curso' %}
+                        <div class="position-relative autocomplete-wrapper">
+                            {{ field }}
+                            <div id="curso-sugestoes" class="list-group position-absolute w-100 autocomplete-results" style="z-index: 1000; max-height: 200px; overflow-y: auto;"></div>
+                        </div>
+                    {% else %}
                         {{ field }}
-                        {{ form.endereco_id }}
-                        <div id="endereco-sugestoes" class="list-group position-absolute w-100 autocomplete-results" style="z-index: 1000;"></div>
-                    </div>
-                {% elif field.name == 'curso' %}
-                    <!-- Autocomplete para Curso -->
-                    <div class="position-relative autocomplete-wrapper">
-                        {{ field }}
-                        <div id="curso-sugestoes" class="list-group position-absolute w-100 autocomplete-results" style="z-index: 1000;"></div>
-                    </div>
-                {% else %}
-                    <!-- Campos Normais -->
-                    {{ field }}
-                {% endif %}
-                
-                {% if field.errors %}
-                    <div class="text-danger small mt-1">{{ field.errors|join:", " }}</div>
-                {% endif %}
-            </div>
+                    {% endif %}
+                    
+                    {% if field.errors %}
+                        <div class="text-danger small mt-1">{{ field.errors|join:", " }}</div>
+                    {% endif %}
+                </div>
             {% endif %}
         {% endfor %}
+    </div>
+
+    <h5 class="border-bottom pb-2 mb-3 mt-4">
+        <i class="bi bi-person-lines-fill me-2 text-primary"></i> Responsável
+    </h5>
+
+    <div class="row">
+        <div class="col-md-12 mb-3">
+            <label class="form-label fw-bold">{{ form.responsavel_nome.label }}</label>
+            <div class="position-relative autocomplete-wrapper">
+                {{ form.responsavel_nome }}
+                {{ form.responsavel_id }}
+                <div id="responsavel-sugestoes" class="list-group position-absolute w-100 autocomplete-results" style="z-index: 1000; max-height: 200px; overflow-y: auto;"></div>
+            </div>
+            {% if form.responsavel_nome.errors %}
+                <div class="text-danger small mt-1">{{ form.responsavel_nome.errors|join:", " }}</div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label class="form-label fw-bold">{{ form.responsavel_cpf.label }}</label>
+            {{ form.responsavel_cpf }}
+            {% if form.responsavel_cpf.errors %}
+                <div class="text-danger small mt-1">{{ form.responsavel_cpf.errors|join:", " }}</div>
+            {% endif %}
+        </div>
+        <div class="col-md-6 mb-3">
+            <label class="form-label fw-bold">{{ form.responsavel_telefone.label }}</label>
+            {{ form.responsavel_telefone }}
+            {% if form.responsavel_telefone.errors %}
+                <div class="text-danger small mt-1">{{ form.responsavel_telefone.errors|join:", " }}</div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label class="form-label fw-bold">{{ form.responsavel_email.label }}</label>
+            {{ form.responsavel_email }}
+            {% if form.responsavel_email.errors %}
+                <div class="text-danger small mt-1">{{ form.responsavel_email.errors|join:", " }}</div>
+            {% endif %}
+        </div>
+        <div class="col-md-6 mb-3">
+            <label class="form-label fw-bold">{{ form.responsavel_parentesco.label }}</label>
+            {{ form.responsavel_parentesco }}
+            {% if form.responsavel_parentesco.errors %}
+                <div class="text-danger small mt-1">{{ form.responsavel_parentesco.errors|join:", " }}</div>
+            {% endif %}
+        </div>
     </div>
 {% endblock %}
 
@@ -55,73 +108,181 @@
         });
     });
 
-(() => {
-    const setupAutocomplete = (inputId, resultsBoxId, endpointUrl, hiddenIdId = null) => {
-        const input = document.getElementById(inputId);
-        const resultsBox = document.getElementById(resultsBoxId);
-        const hiddenId = hiddenIdId ? document.getElementById(hiddenIdId) : null;
-        let debounceId = null;
+    (() => {
+        const setupAutocomplete = (inputId, resultsBoxId, endpointUrl, hiddenIdId = null, onSelectCallback = null, onCreateCallback = null) => {
+            const input = document.getElementById(inputId);
+            const resultsBox = document.getElementById(resultsBoxId);
+            const hiddenId = hiddenIdId ? document.getElementById(hiddenIdId) : null;
+            let debounceId = null;
 
-        if (!input) return;
+            if (!input) return;
 
-        const clearResults = () => { resultsBox.innerHTML = ''; };
+            const clearResults = () => { resultsBox.innerHTML = ''; };
 
-        const showResults = (results) => {
-            clearResults();
-            if (!results.length) return;
-            results.forEach((result) => {
-                const button = document.createElement('button');
-                button.type = 'button';
-                button.className = 'list-group-item list-group-item-action py-2';
-                button.textContent = result.label;
-                button.addEventListener('click', () => {
-                    input.value = result.label;
-                    if (hiddenId) {
-                        hiddenId.value = result.id;
+            const showResults = (results) => {
+                clearResults();
+                if (!results.length) {
+                    if (onCreateCallback && input.value.trim().length >= 2) {
+                        const button = document.createElement('button');
+                        button.type = 'button';
+                        button.className = 'list-group-item list-group-item-action py-2 text-primary';
+                        button.innerHTML = '<i class="bi bi-plus-circle me-2"></i> Cadastrar novo: "' + input.value.trim() + '"';
+                        button.addEventListener('click', () => {
+                            onCreateCallback(input.value.trim());
+                        });
+                        resultsBox.appendChild(button);
                     }
-                    clearResults();
+                    return;
+                }
+                results.forEach((result) => {
+                    const button = document.createElement('button');
+                    button.type = 'button';
+                    button.className = 'list-group-item list-group-item-action py-2';
+                    button.textContent = result.label;
+                    button.addEventListener('click', () => {
+                        input.value = result.label;
+                        if (hiddenId) {
+                            hiddenId.value = result.id;
+                        }
+                        if (onSelectCallback) {
+                            onSelectCallback(result);
+                        }
+                        clearResults();
+                    });
+                    resultsBox.appendChild(button);
                 });
-                resultsBox.appendChild(button);
+
+                if (onCreateCallback && input.value.trim().length >= 2) {
+                    const button = document.createElement('button');
+                    button.type = 'button';
+                    button.className = 'list-group-item list-group-item-action py-2 text-primary border-top';
+                    button.innerHTML = '<i class="bi bi-plus-circle me-2"></i> Cadastrar novo: "' + input.value.trim() + '"';
+                    button.addEventListener('click', () => {
+                        onCreateCallback(input.value.trim());
+                    });
+                    resultsBox.appendChild(button);
+                }
+            };
+
+            const fetchResults = async (query) => {
+                if (!query) { clearResults(); return; }
+                try {
+                    const response = await fetch(`${endpointUrl}?q=${encodeURIComponent(query)}`);
+                    const payload = await response.json();
+                    showResults(payload.results || []);
+                } catch (error) { console.error(error); }
+            };
+
+            input.addEventListener('input', () => {
+                if (hiddenId) hiddenId.value = '';
+                window.clearTimeout(debounceId);
+                const query = input.value.trim();
+                if (query.length >= 2) {
+                    debounceId = window.setTimeout(() => fetchResults(query), 250);
+                } else {
+                    clearResults();
+                }
             });
+
+            input.addEventListener('blur', () => { window.setTimeout(clearResults, 300); });
+
+            if (input.value && hiddenId && hiddenId.value) {
+                fetchResults(input.value.trim());
+            }
         };
 
-        const fetchResults = async (query) => {
-            if (!query) { clearResults(); return; }
-            try {
-                const response = await fetch(`${endpointUrl}?q=${encodeURIComponent(query)}`);
-                const payload = await response.json();
-                showResults(payload.results || []);
-            } catch (error) { console.error(error); }
-        };
+        setupAutocomplete(
+            'id_endereco_busca', 
+            'endereco-sugestoes', 
+            "{% url 'endereco_autocomplete' %}", 
+            'id_endereco_id'
+        );
 
-        input.addEventListener('input', () => {
-            if (hiddenId) hiddenId.value = '';
-            window.clearTimeout(debounceId);
-            debounceId = window.setTimeout(() => fetchResults(input.value.trim()), 250);
+        setupAutocomplete(
+            'id_curso', 
+            'curso-sugestoes', 
+            "{% url 'curso_autocomplete' %}"
+        );
+
+        setupAutocomplete(
+            'id_responsavel_nome',
+            'responsavel-sugestoes',
+            "{% url 'responsavel_autocomplete' %}",
+            'id_responsavel_id',
+            function(selected) {
+                document.getElementById('id_responsavel_cpf').value = selected.cpf || '';
+                document.getElementById('id_responsavel_telefone').value = selected.telefone || '';
+                document.getElementById('id_responsavel_email').value = selected.email || '';
+                document.getElementById('id_responsavel_parentesco').value = selected.parentesco || '';
+            },
+            function(query) {
+                document.getElementById('id_responsavel_nome').value = query;
+                document.getElementById('id_responsavel_id').value = '';
+                document.getElementById('id_responsavel_cpf').focus();
+                const sugestoes = document.getElementById('responsavel-sugestoes');
+                if (sugestoes) sugestoes.innerHTML = '';
+            }
+        );
+
+        document.querySelectorAll('.cpf-mask').forEach(function(input) {
+            input.addEventListener('input', function() {
+                let v = this.value.replace(/\D/g, '');
+                if (v.length <= 11) {
+                    v = v.replace(/(\d{3})(\d)/, '$1.$2');
+                    v = v.replace(/(\d{3})(\d)/, '$1.$2');
+                    v = v.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+                }
+                this.value = v;
+            });
         });
 
-        input.addEventListener('blur', () => { window.setTimeout(clearResults, 200); });
-        
-        if (input.value && hiddenId && hiddenId.value) {
-            fetchResults(input.value.trim());
-        }
-    };
-
-    // autocomplete de Endereço
-    setupAutocomplete(
-        'id_endereco_busca', 
-        'endereco-sugestoes', 
-        "{% url 'endereco_autocomplete' %}", 
-        'id_endereco_id'
-    );
-
-    // autocomplete de Curso
-    setupAutocomplete(
-        'id_curso', 
-        'curso-sugestoes', 
-        "{% url 'curso_autocomplete' %}"
-    );
-
-})();
+        document.querySelectorAll('.telefone-mask').forEach(function(input) {
+            input.addEventListener('input', function() {
+                let v = this.value.replace(/\D/g, '');
+                if (v.length <= 10) {
+                    v = v.replace(/^(\d{2})(\d)/, '($1) $2');
+                    v = v.replace(/(\d{4})(\d)/, '$1-$2');
+                } else {
+                    v = v.replace(/^(\d{2})(\d)/, '($1) $2');
+                    v = v.replace(/(\d{5})(\d)/, '$1-$2');
+                }
+                this.value = v;
+            });
+        });
+    })();
 </script>
+
+<style>
+    .autocomplete-wrapper {
+        position: relative;
+    }
+    .autocomplete-results {
+        background: white;
+        border: 1px solid #ced4da;
+        border-radius: 0 0 4px 4px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        display: none;
+    }
+    .autocomplete-wrapper:focus-within .autocomplete-results {
+        display: block;
+    }
+    .autocomplete-results .list-group-item {
+        border: none;
+        border-bottom: 1px solid #f0f0f0;
+        cursor: pointer;
+    }
+    .autocomplete-results .list-group-item:last-child {
+        border-bottom: none;
+    }
+    .autocomplete-results .list-group-item:hover {
+        background-color: #f0f7ff;
+    }
+    .autocomplete-results .list-group-item.text-primary {
+        color: #0d6efd !important;
+        font-weight: 500;
+    }
+    .autocomplete-results .list-group-item.text-primary:hover {
+        background-color: #e8f0fe;
+    }
+</style>
 {% endblock %}

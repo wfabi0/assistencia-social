@@ -1,22 +1,22 @@
-from django.urls import reverse_lazy
-from django.views.generic import CreateView, ListView, UpdateView, DeleteView
-from django.http import JsonResponse, HttpResponse
-from django.db.models import Q
-from django.shortcuts import redirect, render, get_object_or_404
-from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.decorators import login_required, permission_required
-from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
-from django.contrib import messages
-from .models import Atendimento
-from .forms import AtendimentoForm
-from usuarios.models import Aluno, Servidor, UsuarioExterno
-from django.views import View
-from django.template.loader import render_to_string
 from datetime import date
-from xhtml2pdf import pisa
 from io import BytesIO
 
-# --- MIXIN CUSTOMIZADO ---
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.db.models import Q
+from django.http import JsonResponse, HttpResponse
+from django.shortcuts import redirect, render, get_object_or_404
+from django.template.loader import render_to_string
+from django.urls import reverse_lazy
+from django.views import View
+from django.views.generic import CreateView, ListView, UpdateView, DeleteView
+from xhtml2pdf import pisa
+
+from .forms import AtendimentoForm
+from .models import Atendimento
+from usuarios.models import Aluno, Servidor, UsuarioExterno
+
 class CustomPermissionMixin(PermissionRequiredMixin):
     """
     Mixin que redireciona para a home com uma mensagem de erro 
@@ -26,7 +26,6 @@ class CustomPermissionMixin(PermissionRequiredMixin):
         messages.error(self.request, "Você não tem permissão para acessar esta área.")
         return redirect('home')
 
-# --- VIEWS DE ATENDIMENTO ---
 
 class AtendimentoListView(LoginRequiredMixin, CustomPermissionMixin, ListView):
     permission_required = "atendimentos.view_atendimento"
@@ -35,7 +34,12 @@ class AtendimentoListView(LoginRequiredMixin, CustomPermissionMixin, ListView):
     context_object_name = "atendimentos"
     
     def get_paginate_by(self, queryset):
-        return self.request.GET.get("por_pagina", 10)
+        opcoes = {5, 10, 25, 50}
+        try:
+            valor = int(self.request.GET.get("por_pagina", 10))
+        except (TypeError, ValueError):
+            return 10
+        return valor if valor in opcoes else 10
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -61,6 +65,7 @@ class AtendimentoCreateView(LoginRequiredMixin, CustomPermissionMixin, CreateVie
     success_url = reverse_lazy("lista_atendimentos")
     
     def form_valid(self, form):
+        form.instance.criado_por = self.request.user
         messages.success(self.request, "Atendimento registrado com sucesso.")
         return super().form_valid(form)
 
@@ -86,7 +91,17 @@ class AtendimentoDeleteView(LoginRequiredMixin, CustomPermissionMixin, DeleteVie
         return super().form_valid(form)
 
 class ExportarPDFView(LoginRequiredMixin, CustomPermissionMixin, View):
-    permission_required = 'usuarios.view_aluno'
+    permission_required = "atendimentos.view_atendimento"
+
+    def get_permission_required(self):
+        tipo = self.kwargs.get('tipo')
+        if tipo == 'aluno':
+            return ['usuarios.view_aluno']
+        elif tipo == 'servidor':
+            return ['usuarios.view_servidor']
+        elif tipo == 'usuarioexterno':
+            return ['usuarios.view_usuarioexterno']
+        return ['usuarios.view_aluno']
 
     def get(self, request, tipo, pk):
         if tipo == 'aluno':
@@ -99,6 +114,11 @@ class ExportarPDFView(LoginRequiredMixin, CustomPermissionMixin, View):
             atendimentos = Atendimento.objects.filter(servidor=pessoa).order_by('-data_atendimento')
             tipo_pessoa = 'Servidor'
             filename = f'historico_{pessoa.siape}.pdf'
+        elif tipo == 'usuarioexterno':
+            pessoa = get_object_or_404(UsuarioExterno, pk=pk)
+            atendimentos = Atendimento.objects.filter(usuario_externo=pessoa).order_by('-data_atendimento')
+            tipo_pessoa = 'UsuarioExterno'
+            filename = f'historico_{pessoa.cpf}.pdf'
         else:
             from django.http import Http404
             raise Http404
@@ -119,11 +139,11 @@ class ExportarPDFView(LoginRequiredMixin, CustomPermissionMixin, View):
         response['Content-Disposition'] = f'inline; filename="{filename}"'
         
         return response
-
+    
 # --- BUSCAS VIA AJAX ---
 
 @login_required
-@permission_required("atendimentos.view_aluno", raise_exception=True)
+@permission_required("usuarios.view_aluno", raise_exception=True)
 def buscar_alunos(request):
     q = request.GET.get("q", "").strip()
     if len(q) < 2: return JsonResponse([], safe=False)
@@ -132,7 +152,7 @@ def buscar_alunos(request):
     return JsonResponse(dados, safe=False)
 
 @login_required
-@permission_required("atendimentos.view_servidor", raise_exception=True)
+@permission_required("usuarios.view_servidor", raise_exception=True)
 def buscar_servidores(request):
     q = request.GET.get("q", "").strip()
     if len(q) < 2: return JsonResponse([], safe=False)
@@ -141,7 +161,7 @@ def buscar_servidores(request):
     return JsonResponse(dados, safe=False)
 
 @login_required
-@permission_required("atendimentos.view_usuarioexterno", raise_exception=True)
+@permission_required("usuarios.view_usuarioexterno", raise_exception=True)
 def buscar_usuarios_externos(request):
     q = request.GET.get("q", "").strip()
     if len(q) < 2: return JsonResponse([], safe=False)
