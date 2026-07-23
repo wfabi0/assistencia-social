@@ -200,3 +200,4 @@ git push origin seu-nome/nome-da-tarefa
 ## Documentação da API
 
 A documentação da API está disponível em `/api/docs/`.
+> Para acessar a documentação é necessário estar logado como super usuário.
