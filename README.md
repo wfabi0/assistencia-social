@@ -1,79 +1,120 @@
-# 📝 Sistema de Registro de Atendimentos
+# Sistema de Registro de Atendimentos
 
-Desenvolvimento do sistema de registro de atendimentos para o IFMG Campus São João Evangelista! Este sistema foi projetado para substituir a antiga base em PHP por uma solução mais eficiente e amigável, utilizando Python. 🚀
+Sistema web para registro e acompanhamento de atendimentos do IFMG Campus São João Evangelista. O projeto centraliza cadastros, históricos e exportação de informações, com autenticação e controle de acesso por permissões do Django.
 
----
+## Objetivo do sistema
 
-## 🛠️ Tecnologias Utilizadas
+Organizar o registro de alunos, servidores, usuários externos e atendimentos em uma aplicação única, substituindo processos dispersos e facilitando consulta e histórico.
 
-- **Python**: Linguagem principal para o backend.
-- **Django**: Framework web para desenvolvimento rápido e seguro.
-- **MySQL**: Banco de dados relacional robusto para armazenamento seguro das informações.
-- **HTML, CSS e JavaScript**: Para a interface do usuário.
+## Requisitos
 
----
+- Python 3.14 ou superior.
+- MySQL 8 ou compatível.
+- Ambiente virtual Python.
+- Dependências listadas em `requirements.txt`.
 
-## ⚙️ Como Configurar o Projeto
+## Instalação das dependências
 
-Siga os passos abaixo para configurar o ambiente de desenvolvimento:
+Crie e ative o ambiente virtual e instale os pacotes:
 
-1. **Clone o repositório**:
+```bash
+python -m venv .venv
+.venv\Scripts\activate
+pip install -r requirements.txt
+```
 
-   ```bash
-   git clone https://github.com/wfabi0/assistencia-social.git
-   ```
+## Criação do banco MySQL
 
-2. **Crie e ative um ambiente virtual**:
+Crie o banco antes de executar as migrações:
 
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # No Windows: venv\Scripts\activate
-   ```
+```sql
+CREATE DATABASE assistencia_social
+CHARACTER SET utf8mb4
+COLLATE utf8mb4_unicode_ci;
+```
 
-3. **Instale as dependências**:
+## Versão do Python
 
-   ```bash
-   pip install -r requirements.txt
-   ```
+O projeto foi preparado para Python 3.14+.
 
-4. **Configure as variáveis de ambiente**:
+## Configuração do `.env`
 
-   ```bash
-   cp .env.exemple .env
-   ```
+Existe um template em `.env.example`. Copie-o para `.env` e ajuste os valores:
 
-   Edite o arquivo `.env` e configure as variáveis com suas informações do banco de dados:
+```bash
+copy .env.example .env
+```
 
-   ```env
-   SECRET_KEY=sua-chave-aqui
-   DEBUG=True
-   DB_NAME=assistencia_social
-   DB_USER=root
-   DB_PASSWORD=sua_senha_aqui
-   DB_HOST=localhost
-   DB_PORT=3306
-   ```
+Conteúdo esperado:
 
-   > **Nota:** Nunca commite o arquivo `.env` com dados sensíveis. Use o `.env.exemple` como template. NÃO APAGUE O `.env.example`.
+```env
+SECRET_KEY=sua-chave-aqui
+DEBUG=True
+DB_NAME=assistencia_social
+DB_USER=root
+DB_PASSWORD=senha
+DB_HOST=localhost
+DB_PORT=3306
+ALLOWED_HOSTS=*
+```
 
-5. **Realize as migrações do banco de dados**:
+Não envie o arquivo `.env` para o repositório.
 
-   ```bash
-   python manage.py migrate
-   ```
+## Execução das migrações
 
-6. **Inicie o servidor de desenvolvimento**:
+Depois de configurar o banco e o `.env`, execute:
 
-   ```bash
-   python manage.py runserver
-   ```
+```bash
+python manage.py migrate
+```
 
-7. **Acesse o sistema**:
-   Abra o navegador e vá para http://127.0.0.1:8000.
+## Criação do superusuário
 
----
+```bash
+python manage.py createsuperuser
+```
 
-## 👥 Membros da Equipe
+Use esse usuário para acessar o painel administrativo e configurar grupos, permissões e outros cadastros iniciais.
+
+## Criação de usuário comum
+
+Os usuários comuns devem ser criados pelo painel administrativo.
+
+## Grupos e permissões
+
+O sistema usa permissões padrão do Django nas views de alunos, servidores, usuários externos e atendimentos. Crie os grupos no admin e associe as permissões conforme o perfil.
+
+## Como iniciar o servidor
+
+```bash
+python manage.py runserver
+```
+
+Depois, acesse `http://127.0.0.1:8000/`.
+> Para `http://127.0.0.1:8000/admin` para as configurações iniciais de permissões e usuário inicial sem superuser.
+
+## Como popular o banco de demonstração
+
+O arquivo `popular_banco.py` cria dados fictícios de endereços, alunos, responsáveis, servidores, usuários externos e atendimentos.
+
+```bash
+python popular_banco.py
+```
+
+Execute esse script somente em ambiente de desenvolvimento, porque ele insere dados de teste em volume.
+
+## Funcionalidades
+
+- Autenticação com login e logout.
+- Controle de acesso por permissões do Django.
+- CRUD de alunos, servidores e usuários externos.
+- Cadastro e listagem de atendimentos.
+- Histórico de atendimentos por pessoa.
+- Exportação de histórico em PDF.
+- Autocomplete de endereço, responsável e curso.
+- API REST e documentação Swagger/OpenAPI em `/api/docs/`.
+
+## Equipe
 
 - Fábio Emanuell Pereira Milagres
 - Felipe Martins dos Santos
@@ -82,9 +123,7 @@ Siga os passos abaixo para configurar o ambiente de desenvolvimento:
 - Julya Alves Cordeiro de Macedo
 - Tayllon Junior Maciel Rodrigues
 
----
-
-## 🔄 Como Contribuir (Fluxo de Trabalho)
+## Como Contribuir (Fluxo de Trabalho)
 
 Para mantermos o projeto organizado e evitarmos conflitos no código, utilizaremos um padrão estrito para a criação de branches. **Nunca faça alterações diretas na branch `main`.**
 
@@ -150,9 +189,7 @@ git push origin seu-nome/nome-da-tarefa
 - Descreva as alterações realizadas.
 - Solicite revisão antes do merge.
 
----
-
-## 📌 Boas Práticas
+## Boas Práticas
 
 - Sempre mantenha sua branch atualizada com a `main`.
 - Faça commits pequenos e organizados.
@@ -160,10 +197,6 @@ git push origin seu-nome/nome-da-tarefa
 - Revise seu código antes de abrir um Pull Request.
 - Nunca envie arquivos desnecessários para o repositório.
 
----
+## Documentação da API
 
-## 📚 Documentação da API
-
-Documentação usando Swagger/OpenAPI.
-
-Acesse por `/api/docs/`
+A documentação da API está disponível em `/api/docs/`.
